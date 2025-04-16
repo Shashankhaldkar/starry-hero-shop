@@ -95,7 +95,8 @@ export const products: Product[] = [
     rating: 4.5,
     reviewCount: 28,
     inStock: true,
-    featured: true
+    featured: true,
+    stock: 50  // Added stock property
   },
   {
     id: '2',
@@ -113,7 +114,8 @@ export const products: Product[] = [
     rating: 4.8,
     reviewCount: 42,
     inStock: true,
-    featured: true
+    featured: true,
+    stock: 35  // Added stock property
   },
   {
     id: '3',
@@ -131,7 +133,8 @@ export const products: Product[] = [
     colors: ['Red', 'Blue', 'Black'],
     rating: 4.6,
     reviewCount: 37,
-    inStock: true
+    inStock: true,
+    stock: 40  // Added stock property
   },
   {
     id: '4',
@@ -148,7 +151,8 @@ export const products: Product[] = [
     colors: ['Grey', 'Blue', 'Black'],
     rating: 4.3,
     reviewCount: 18,
-    inStock: true
+    inStock: true,
+    stock: 25  // Added stock property
   },
   {
     id: '5',
@@ -165,7 +169,8 @@ export const products: Product[] = [
     colors: ['Blue', 'Red', 'Black'],
     rating: 4.7,
     reviewCount: 23,
-    inStock: true
+    inStock: true,
+    stock: 30  // Added stock property
   },
   {
     id: '6',
@@ -184,7 +189,8 @@ export const products: Product[] = [
     rating: 4.9,
     reviewCount: 48,
     inStock: true,
-    featured: true
+    featured: true,
+    stock: 45  // Added stock property
   },
   {
     id: '7',
@@ -201,7 +207,8 @@ export const products: Product[] = [
     colors: ['Red', 'Yellow', 'Black'],
     rating: 4.2,
     reviewCount: 15,
-    inStock: true
+    inStock: true,
+    stock: 20  // Added stock property
   },
   {
     id: '8',
@@ -218,6 +225,8 @@ export const products: Product[] = [
     colors: ['Black', 'Grey', 'Navy'],
     rating: 4.4,
     reviewCount: 19,
-    inStock: true
+    inStock: true,
+    stock: 28  // Added stock property
   }
 ];
+
