@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,11 +16,30 @@ import Shop from "./pages/Shop";
 import Collections from "./pages/Collections";
 import Account from "./pages/Account";
 
+import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { LoginRegisterModal } from "@/components/LoginRegisterModal";
+
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+const ProtectedRoutes = () => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <div className="flex justify-center items-center min-h-screen text-xl">Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    // Show login/register modal and nothing else if not authenticated
+    return (
+      <>
+        <LoginRegisterModal open={true} />
+        <div className="fixed inset-0 bg-starry-darkPurple/90 backdrop-blur-sm z-30" />
+      </>
+    );
+  }
+
+  return (
+    <>
       <Toaster />
       <Sonner />
       <CartProvider>
@@ -36,11 +54,20 @@ const App = () => (
             <Route path="/cart" element={<Cart />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/about" element={<About />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </CartProvider>
+    </>
+  );
+};
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <AuthProvider>
+        <ProtectedRoutes />
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
