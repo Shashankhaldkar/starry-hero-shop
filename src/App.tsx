@@ -13,6 +13,10 @@ import Cart from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
 import About from "./pages/About";
 
+import Shop from "./pages/Shop";
+import Collections from "./pages/Collections";
+import Account from "./pages/Account";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -24,6 +28,9 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/collections" element={<Collections />} />
+            <Route path="/account" element={<Account />} />
             <Route path="/products" element={<Products />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<Cart />} />

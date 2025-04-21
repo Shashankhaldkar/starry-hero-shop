@@ -1,7 +1,7 @@
-
 import { useState } from 'react';
 import { ShoppingCart, User, Search, Menu, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,27 +17,27 @@ export function Header() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <a href="/" className="flex items-center space-x-2">
+            <Link to="/" className="flex items-center space-x-2">
               <span className="text-2xl font-bold bg-gradient-to-r from-starry-purple to-starry-vividPurple text-transparent bg-clip-text">
                 Starry<span className="text-starry-orange">Hero</span>
               </span>
-            </a>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="/" className="text-white hover:text-starry-purple transition-colors">
+            <Link to="/" className="text-white hover:text-starry-purple transition-colors">
               Home
-            </a>
-            <a href="/shop" className="text-white hover:text-starry-purple transition-colors">
+            </Link>
+            <Link to="/shop" className="text-white hover:text-starry-purple transition-colors">
               Shop
-            </a>
-            <a href="/collections" className="text-white hover:text-starry-purple transition-colors">
+            </Link>
+            <Link to="/collections" className="text-white hover:text-starry-purple transition-colors">
               Collections
-            </a>
-            <a href="/about" className="text-white hover:text-starry-purple transition-colors">
+            </Link>
+            <Link to="/about" className="text-white hover:text-starry-purple transition-colors">
               About
-            </a>
+            </Link>
           </nav>
 
           {/* Desktop Actions */}
@@ -70,18 +70,18 @@ export function Header() {
         {isMenuOpen && (
           <div className="md:hidden pt-4 pb-6 space-y-4">
             <nav className="flex flex-col space-y-4">
-              <a href="/" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
+              <Link to="/" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
                 Home
-              </a>
-              <a href="/shop" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
+              </Link>
+              <Link to="/shop" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
                 Shop
-              </a>
-              <a href="/collections" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
+              </Link>
+              <Link to="/collections" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
                 Collections
-              </a>
-              <a href="/about" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
+              </Link>
+              <Link to="/about" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
                 About
-              </a>
+              </Link>
             </nav>
             <div className="flex items-center space-x-4 pt-4 border-t border-starry-darkPurple/20">
               <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple">
