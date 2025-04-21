@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { LogIn, UserPlus, Google } from "lucide-react";
+import { LogIn, UserPlus, Mail } from "lucide-react";
 
 interface LoginRegisterModalProps {
   open: boolean;
@@ -67,12 +67,12 @@ export const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({ open }) 
           <Input name="email" type="email" placeholder="Email" autoComplete="username" required value={form.email} onChange={handleChange} />
           <Input name="password" type="password" placeholder="Password" autoComplete={view === "login" ? "current-password" : "new-password"} required value={form.password} onChange={handleChange} />
           {error && <span className="text-destructive text-sm">{error}</span>}
-          <Button type="submit" className="w-full" loading={loading.toString()}>
+          <Button type="submit" className="w-full" disabled={loading}>
             {view === "login" ? "Login" : "Register"}
           </Button>
         </form>
         <Button variant="outline" className="w-full flex items-center justify-center gap-2" type="button" onClick={handleGoogleLogin}>
-          <Google className="w-4 h-4" /> Continue with Google
+          <Mail className="w-4 h-4" /> Continue with Google
         </Button>
         <p className="text-xs text-center mt-2">
           {view === "login" ? (
