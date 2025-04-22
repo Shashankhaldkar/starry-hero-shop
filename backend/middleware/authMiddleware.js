@@ -21,14 +21,16 @@ const protect = async (req, res, next) => {
       // Get user from the token
       req.user = await User.findById(decoded.id).select('-password');
 
+      if (!req.user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
       next();
     } catch (error) {
-      console.error(error);
+      console.error('Auth middleware error:', error);
       res.status(401).json({ message: 'Not authorized, token failed' });
     }
-  }
-
-  if (!token) {
+  } else if (!token) {
     res.status(401).json({ message: 'Not authorized, no token' });
   }
 };

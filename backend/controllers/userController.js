@@ -13,10 +13,6 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'Please provide all required fields' });
-    }
-
     if (password.length < 6) {
       return res.status(400).json({ message: 'Password must be at least 6 characters' });
     }
@@ -41,7 +37,7 @@ const registerUser = async (req, res) => {
         email: user.email,
         role: user.role,
         avatar: user.avatar,
-        token: user.getSignedJwtToken(),
+        token: generateToken(user._id),
       });
     } else {
       res.status(400).json({ message: 'Invalid user data' });
@@ -52,6 +48,12 @@ const registerUser = async (req, res) => {
   }
 };
 
+// Helper function to generate JWT token
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: '30d',
+  });
+};
 
 // @desc    Auth user & get token
 // @route   POST /api/users/login
@@ -78,13 +80,16 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    // Generate token using separate function
+    const token = generateToken(user._id);
+
     res.json({
       _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
       avatar: user.avatar,
-      token: user.getSignedJwtToken(),
+      token,
     });
   } catch (error) {
     console.error('Login error:', error);

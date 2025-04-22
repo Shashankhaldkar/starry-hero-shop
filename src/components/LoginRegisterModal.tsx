@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { register } from '../api/auth';
 
 import {
   Dialog,
@@ -65,6 +64,7 @@ export const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({ open }) 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setError(null); // Clear error when user types
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -77,14 +77,15 @@ export const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({ open }) 
         throw new Error("Email and password are required");
       }
       
-      await loginUser(form.email, form.password);
+      const result = await loginUser(form.email, form.password);
+      console.log("Login successful:", result);
       toast({
         title: "Login successful",
         description: "Welcome back to StarryHero!",
       });
     } catch (err: any) {
       console.error("Login error:", err);
-      setError(err.response?.data?.message || "Invalid credentials. Please try again!");
+      setError(err.message || "Invalid credentials. Please try again!");
     } finally {
       setLoading(false);
     }
@@ -104,14 +105,15 @@ export const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({ open }) 
         throw new Error("Password must be at least 6 characters");
       }
       
-      await registerUser(form.name, form.email, form.password);
+      const result = await registerUser(form.name, form.email, form.password);
+      console.log("Registration successful:", result);
       toast({
         title: "Registration successful",
         description: "Welcome to StarryHero!",
       });
     } catch (err: any) {
       console.error("Registration error:", err);
-      setError(err.response?.data?.message || "Registration failed. Try another email!");
+      setError(err.message || "Registration failed. Try another email!");
     } finally {
       setLoading(false);
     }
@@ -198,7 +200,9 @@ export const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({ open }) 
                 className="animate-fade-in"
               />
               {error && (
-                <span className="text-destructive text-sm animate-shake">{error}</span>
+                <div className="text-destructive text-sm animate-shake bg-destructive/10 p-2 rounded">
+                  {error}
+                </div>
               )}
               <Button
                 type="submit"

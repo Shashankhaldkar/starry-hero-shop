@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
-import { getUserProfile, login, register as registerUser } from "@/api/auth";
+import * as authAPI from "@/api/auth";
 
 interface AuthContextProps {
   user: any;
@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      getUserProfile()
+      authAPI.getUserProfile()
         .then((profile) => {
           setUser(profile);
         })
@@ -43,7 +43,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     
     try {
-      const data = await login({ email, password });
+      console.log("Attempting login with:", { email });
+      const data = await authAPI.login({ email, password });
+      console.log("Login response:", data);
       setUser(data);
       return data;
     } catch (error) {
@@ -62,7 +64,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     
     try {
-      const data = await registerUser({ name, email, password });
+      console.log("Attempting registration with:", { name, email });
+      const data = await authAPI.register({ name, email, password });
+      console.log("Registration response:", data);
       setUser(data);
       return data;
     } catch (error) {
@@ -72,9 +76,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logoutFn = () => {
+    authAPI.logout();
     setUser(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
   };
 
   return (

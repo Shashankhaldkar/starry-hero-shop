@@ -1,4 +1,3 @@
-
 import API from './index';
 
 interface UserData {
@@ -22,8 +21,9 @@ export const register = async (userData: UserData) => {
     }
     return data;
   } catch (error: any) {
-    console.error('Error registering user:', error.response?.data || error);
-    throw error;
+    console.error('Error registering user:', error);
+    const errorMessage = error.response?.data?.message || 'Registration failed. Please try again.';
+    throw new Error(errorMessage);
   }
 };
 
@@ -40,8 +40,9 @@ export const login = async (loginData: LoginData) => {
     
     return data;
   } catch (error: any) {
-    console.error('Error logging in:', error.response?.data || error);
-    throw error;
+    console.error('Error logging in:', error);
+    const errorMessage = error.response?.data?.message || 'Login failed. Please check your credentials.';
+    throw new Error(errorMessage);
   }
 };
 
@@ -57,9 +58,10 @@ export const getUserProfile = async () => {
   try {
     const { data } = await API.get('/users/profile');
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching user profile:', error);
-    throw error;
+    const errorMessage = error.response?.data?.message || 'Failed to fetch user profile.';
+    throw new Error(errorMessage);
   }
 };
 
