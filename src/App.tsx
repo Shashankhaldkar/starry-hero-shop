@@ -1,8 +1,9 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -15,6 +16,7 @@ import About from "./pages/About";
 import Shop from "./pages/Shop";
 import Collections from "./pages/Collections";
 import Account from "./pages/Account";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
 
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { LoginRegisterModal } from "@/components/LoginRegisterModal";
@@ -22,7 +24,7 @@ import { LoginRegisterModal } from "@/components/LoginRegisterModal";
 const queryClient = new QueryClient();
 
 const ProtectedRoutes = () => {
-  const { isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return <div className="flex justify-center items-center min-h-screen text-xl">Loading...</div>;
@@ -45,7 +47,31 @@ const ProtectedRoutes = () => {
       <CartProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            {/* Admin route with role check */}
+            <Route
+              path="/admin/*"
+              element={
+                user && user.role === "admin" ? (
+                  <AdminDashboard />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
+            
+            {/* Route user to admin panel if they're an admin, otherwise to homepage */}
+            <Route
+              path="/"
+              element={
+                user && user.role === "admin" ? (
+                  <Navigate to="/admin" replace />
+                ) : (
+                  <Index />
+                )
+              }
+            />
+            
+            {/* Regular user routes */}
             <Route path="/shop" element={<Shop />} />
             <Route path="/collections" element={<Collections />} />
             <Route path="/account" element={<Account />} />
