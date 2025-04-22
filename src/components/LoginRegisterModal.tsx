@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { register } from '../api/auth';
+
 import {
   Dialog,
   DialogContent,
@@ -80,7 +82,11 @@ export const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({ open }) 
     setLoading(true);
     setError(null);
     try {
-      await registerUser(form.name, form.email, form.password);
+      await register({
+        name: form.name,
+        email: form.email,
+        password: form.password
+      });
       // add mild animation or success feedback
     } catch (err: any) {
       setError("🚨 Registration failed. Try another email!");

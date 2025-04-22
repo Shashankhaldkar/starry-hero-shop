@@ -16,16 +16,13 @@ interface LoginData {
 export const register = async (userData: UserData) => {
   try {
     const { data } = await API.post('/users', userData);
-    
-    // Save token to localStorage
     if (data.token) {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data));
     }
-    
     return data;
   } catch (error) {
-    console.error('Error registering user:', error);
+    console.error('Error registering user:', error.response?.data || error.message);
     throw error;
   }
 };
