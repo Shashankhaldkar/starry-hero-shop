@@ -1,4 +1,3 @@
-
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 
@@ -14,6 +13,15 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Please provide all required fields' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
+
+    // Check if user exists
     const userExists = await User.findOne({ email });
 
     if (userExists) {
@@ -39,7 +47,7 @@ const registerUser = async (req, res) => {
       res.status(400).json({ message: 'Invalid user data' });
     }
   } catch (error) {
-    console.error("Register error:", error);
+    console.error('Register error:', error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -51,6 +59,10 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Please provide email and password' });
+    }
 
     // Check for user
     const user = await User.findOne({ email }).select('+password');
@@ -75,6 +87,7 @@ const loginUser = async (req, res) => {
       token: user.getSignedJwtToken(),
     });
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({ message: error.message });
   }
 };

@@ -25,9 +25,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .then((profile) => {
           setUser(profile);
         })
-        .catch(() => {
+        .catch((error) => {
+          console.error("Error fetching user profile:", error);
           setUser(null);
           localStorage.removeItem("token");
+          localStorage.removeItem("user");
         })
         .finally(() => setLoading(false));
     } else {
@@ -36,15 +38,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const loginUser = async (email: string, password: string) => {
-    const data = await login({ email, password });
-    setUser(data);
-    return data;
+    if (!email || !password) {
+      throw new Error("Email and password are required");
+    }
+    
+    try {
+      const data = await login({ email, password });
+      setUser(data);
+      return data;
+    } catch (error) {
+      console.error("Login error in context:", error);
+      throw error;
+    }
   };
 
   const registerUserFn = async (name: string, email: string, password: string) => {
-    const data = await registerUser({ name, email, password });
-    setUser(data);
-    return data;
+    if (!name || !email || !password) {
+      throw new Error("All fields are required");
+    }
+    
+    if (password.length < 6) {
+      throw new Error("Password must be at least 6 characters");
+    }
+    
+    try {
+      const data = await registerUser({ name, email, password });
+      setUser(data);
+      return data;
+    } catch (error) {
+      console.error("Registration error in context:", error);
+      throw error;
+    }
   };
 
   const logoutFn = () => {
