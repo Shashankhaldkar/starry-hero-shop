@@ -24,8 +24,8 @@ export const register = async (userData: UserData) => {
     }
     
     return data;
-  } catch (error) {
-    console.error('Error registering user:', error);
+  } catch (error: any) {
+    console.error('Error registering user:', error.response?.data || error);
     throw error;
   }
 };
@@ -42,8 +42,8 @@ export const login = async (loginData: LoginData) => {
     }
     
     return data;
-  } catch (error) {
-    console.error('Error logging in:', error);
+  } catch (error: any) {
+    console.error('Error logging in:', error.response?.data || error);
     throw error;
   }
 };

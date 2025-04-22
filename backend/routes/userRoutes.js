@@ -18,6 +18,13 @@ const {
 router.post('/', registerUser);
 router.post('/login', loginUser);
 
+// Google OAuth route (stub for now)
+router.get('/auth/google', (req, res) => {
+  // In a real implementation, this would redirect to Google OAuth
+  // For now, we'll just return a message
+  res.status(501).json({ message: 'Google OAuth not fully implemented yet' });
+});
+
 // Profile routes
 router.get('/profile', protect, getUserProfile);
 router.put('/profile', protect, updateUserProfile);

@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { LogIn, UserPlus, Mail } from "lucide-react";
 import {
@@ -15,6 +16,7 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import { useToast } from "@/hooks/use-toast";
 
 // Superhero image placeholders
 const HERO_IMAGES = [
@@ -46,6 +48,7 @@ interface LoginRegisterModalProps {
 
 export const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({ open }) => {
   const { loginUser, registerUser } = useAuth();
+  const { toast } = useToast();
 
   const [view, setView] = useState<"login" | "register">("login");
   const [form, setForm] = useState({ name: "", email: "", password: "" });
@@ -66,26 +69,50 @@ export const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({ open }) 
     e.preventDefault();
     setLoading(true);
     setError(null);
+    
     try {
+      if (!form.email || !form.password) {
+        throw new Error("Email and password are required");
+      }
+      
       await loginUser(form.email, form.password);
-      // add mild animation or success feedback (you can display a toast elsewhere)
+      toast({
+        title: "Login successful",
+        description: "Welcome back to StarryHero!",
+      });
     } catch (err: any) {
-      setError("😅 Invalid credentials. Please try again!");
+      console.error("Login error:", err);
+      setError(err.response?.data?.message || "Invalid credentials. Please try again!");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    
     try {
+      if (!form.name || !form.email || !form.password) {
+        throw new Error("All fields are required");
+      }
+      
+      if (form.password.length < 6) {
+        throw new Error("Password must be at least 6 characters");
+      }
+      
       await registerUser(form.name, form.email, form.password);
-      // add mild animation or success feedback
+      toast({
+        title: "Registration successful",
+        description: "Welcome to StarryHero!",
+      });
     } catch (err: any) {
-      setError("🚨 Registration failed. Try another email!");
+      console.error("Registration error:", err);
+      setError(err.response?.data?.message || "Registration failed. Try another email!");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // Redirect to backend Google OAuth endpoint
@@ -125,15 +152,15 @@ export const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({ open }) 
                 {view === "login" ? <LogIn className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
                 {view === "login" ? "Sign In to StarryHero" : "Create your StarryHero Account"}
               </DialogTitle>
+              <DialogDescription>
+                {view === "login"
+                  ? "Join the hero league! Log in to access your superpowers."
+                  : "Register and begin your superhero story with us."}
+              </DialogDescription>
             </DialogHeader>
-            <p className="mb-4 text-muted-foreground text-center text-sm">
-              {view === "login"
-                ? "Join the hero league! Log in to access your superpowers."
-                : "Register and begin your superhero story with us."}
-            </p>
             <form
               onSubmit={view === "login" ? handleLogin : handleRegister}
-              className="flex flex-col gap-3"
+              className="flex flex-col gap-3 mt-4"
               autoComplete="on"
             >
               {view === "register" && (
@@ -163,6 +190,7 @@ export const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({ open }) 
                 placeholder="Password"
                 autoComplete={view === "login" ? "current-password" : "new-password"}
                 required
+                minLength={6}
                 value={form.password}
                 onChange={handleChange}
                 className="animate-fade-in"
