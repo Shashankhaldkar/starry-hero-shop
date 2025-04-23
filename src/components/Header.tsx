@@ -2,17 +2,45 @@
 import { useState, useEffect } from 'react';
 import { ShoppingCart, User, Search, Menu, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { Input } from "@/components/ui/input";
 
 export function Header() {
   const { user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const navigate = useNavigate();
   const isAdmin = user && user.role === 'admin';
+
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cartItems');
+    if (savedCart) {
+      try {
+        const cartItems = JSON.parse(savedCart);
+        setCartCount(cartItems.reduce((count, item) => count + item.quantity, 0));
+      } catch (error) {
+        console.error('Error parsing cart items:', error);
+      }
+    }
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchQuery)}`);
+      setIsSearchOpen(false);
+    }
+  };
+
+  const toggleSearch = () => {
+    setIsSearchOpen(!isSearchOpen);
   };
 
   return (
@@ -65,9 +93,31 @@ export function Header() {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple hover:bg-starry-darkPurple/20">
-              <Search className="h-5 w-5" />
-            </Button>
+            {isSearchOpen ? (
+              <form onSubmit={handleSearchSubmit} className="relative animate-fade-in">
+                <Input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-56 bg-starry-darkPurple/50 border-starry-purple/30 text-white focus:border-starry-purple"
+                  autoFocus
+                />
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  size="icon" 
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-white hover:text-starry-purple"
+                  onClick={toggleSearch}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </form>
+            ) : (
+              <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple hover:bg-starry-darkPurple/20" onClick={toggleSearch}>
+                <Search className="h-5 w-5" />
+              </Button>
+            )}
             <Link to="/account">
               <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple hover:bg-starry-darkPurple/20">
                 <User className="h-5 w-5" />
@@ -98,6 +148,27 @@ export function Header() {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden pt-4 pb-6 space-y-4">
+            {/* Mobile Search */}
+            <form onSubmit={handleSearchSubmit} className="mb-4">
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-starry-darkPurple/50 border-starry-purple/30 text-white"
+                />
+                <Button 
+                  type="submit" 
+                  variant="ghost" 
+                  size="icon" 
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-white"
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
+              </div>
+            </form>
+            
             <nav className="flex flex-col space-y-4">
               {isAdmin ? (
                 <>
@@ -132,9 +203,6 @@ export function Header() {
               )}
             </nav>
             <div className="flex items-center space-x-4 pt-4 border-t border-starry-darkPurple/20">
-              <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple">
-                <Search className="h-5 w-5" />
-              </Button>
               <Link to="/account">
                 <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple">
                   <User className="h-5 w-5" />
