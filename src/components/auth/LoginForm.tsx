@@ -48,6 +48,11 @@ export const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
     } catch (err: any) {
       console.error("Login error:", err);
       setError(err.message || "Invalid credentials. Please try again!");
+      
+      // Show specific message for admin access denied
+      if (err.message && err.message.includes('admin')) {
+        setError("Not authorized as an admin. Please use regular login.");
+      }
     } finally {
       setLoading(false);
     }

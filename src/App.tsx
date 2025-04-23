@@ -30,8 +30,8 @@ const ProtectedRoutes = () => {
     return <div className="flex justify-center items-center min-h-screen text-xl">Loading...</div>;
   }
 
+  // If user is not authenticated, show login modal
   if (!isAuthenticated) {
-    // Show login/register modal and nothing else if not authenticated
     return (
       <>
         <LoginRegisterModal open={true} />
@@ -40,6 +40,25 @@ const ProtectedRoutes = () => {
     );
   }
 
+  // If user is authenticated and is an admin, redirect to admin dashboard
+  if (user && user.role === "admin") {
+    return (
+      <>
+        <Toaster />
+        <Sonner />
+        <CartProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/admin/*" element={<AdminDashboard />} />
+              <Route path="*" element={<Navigate to="/admin" replace />} />
+            </Routes>
+          </BrowserRouter>
+        </CartProvider>
+      </>
+    );
+  }
+
+  // Regular user routes
   return (
     <>
       <Toaster />
@@ -47,81 +66,15 @@ const ProtectedRoutes = () => {
       <CartProvider>
         <BrowserRouter>
           <Routes>
-            {/* Admin route with role check */}
-            <Route
-              path="/admin/*"
-              element={
-                user && user.role === "admin" ? (
-                  <AdminDashboard />
-                ) : (
-                  <Navigate to="/" replace />
-                )
-              }
-            />
-            
-            {/* Check user role and redirect accordingly */}
-            <Route
-              path="/"
-              element={
-                user && user.role === "admin" ? (
-                  <Navigate to="/admin" replace />
-                ) : (
-                  <Index />
-                )
-              }
-            />
-            
-            {/* Regular user routes */}
-            <Route path="/shop" element={
-              user && user.role === "admin" ? (
-                <Navigate to="/admin" replace />
-              ) : (
-                <Shop />
-              )
-            } />
-            <Route path="/collections" element={
-              user && user.role === "admin" ? (
-                <Navigate to="/admin" replace />
-              ) : (
-                <Collections />
-              )
-            } />
+            <Route path="/" element={<Index />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/collections" element={<Collections />} />
             <Route path="/account" element={<Account />} />
-            <Route path="/products" element={
-              user && user.role === "admin" ? (
-                <Navigate to="/admin" replace />
-              ) : (
-                <Products />
-              )
-            } />
-            <Route path="/product/:id" element={
-              user && user.role === "admin" ? (
-                <Navigate to="/admin" replace />
-              ) : (
-                <ProductDetail />
-              )
-            } />
-            <Route path="/cart" element={
-              user && user.role === "admin" ? (
-                <Navigate to="/admin" replace />
-              ) : (
-                <Cart />
-              )
-            } />
-            <Route path="/wishlist" element={
-              user && user.role === "admin" ? (
-                <Navigate to="/admin" replace />
-              ) : (
-                <Wishlist />
-              )
-            } />
-            <Route path="/about" element={
-              user && user.role === "admin" ? (
-                <Navigate to="/admin" replace />
-              ) : (
-                <About />
-              )
-            } />
+            <Route path="/products" element={<Products />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/about" element={<About />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
