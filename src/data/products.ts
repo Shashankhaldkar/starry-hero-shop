@@ -52,7 +52,7 @@ export const themes: Theme[] = [
   },
   { 
     id: 'dc', 
-    name: 'DC SEXY Universe', 
+    name: 'DC Comics', 
     image: 'https://images.unsplash.com/photo-1531259683007-016a7b628fc3?auto=format&fit=crop&q=80&w=500' 
   },
   { 
