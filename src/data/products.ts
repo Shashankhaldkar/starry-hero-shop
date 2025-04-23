@@ -28,7 +28,7 @@ export const categories: Category[] = [
     image: 'https://images.unsplash.com/photo-1519278409-1f56fdda7fe5?auto=format&fit=crop&q=80&w=500' 
   },
   { 
-    id: 'long-sleeve', 
+    id: 'long-sleeved', 
     name: 'Long Sleeve', 
     image: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&q=80&w=500' 
   },
