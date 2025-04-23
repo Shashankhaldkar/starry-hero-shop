@@ -14,7 +14,7 @@ const generateToken = (id) => {
 // @access  Public
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, isAdmin } = req.body;
     console.log("Incoming user data:", req.body);
 
     if (!name || !email || !password) {
@@ -31,10 +31,14 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
+    // Set role based on isAdmin flag
+    const role = isAdmin ? 'admin' : 'user';
+
     const user = await User.create({
       name,
       email,
       password,
+      role,
     });
 
     if (user) {
@@ -60,7 +64,7 @@ const registerUser = async (req, res) => {
 // @access  Public
 const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, isAdmin } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ message: 'Please provide email and password' });
@@ -76,6 +80,11 @@ const loginUser = async (req, res) => {
 
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Check if user is trying to log in as admin but doesn't have admin role
+    if (isAdmin && user.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized as an admin' });
     }
 
     const token = generateToken(user._id);

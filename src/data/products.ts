@@ -3,7 +3,7 @@ import { Product, Category, Theme } from '../types';
 
 export const categories: Category[] = [
   { 
-    id: 'oversized', 
+    id: 'oversize', 
     name: 'Oversized', 
     image: 'https://images.unsplash.com/photo-1646634580162-d8519e51aa8e?auto=format&fit=crop&q=80&w=500' 
   },

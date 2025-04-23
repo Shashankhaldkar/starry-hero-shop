@@ -4,11 +4,13 @@ interface UserData {
   name: string;
   email: string;
   password: string;
+  isAdmin?: boolean;
 }
 
 interface LoginData {
   email: string;
   password: string;
+  isAdmin?: boolean;
 }
 
 // Register a new user

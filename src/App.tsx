@@ -30,8 +30,8 @@ const ProtectedRoutes = () => {
     return <div className="flex justify-center items-center min-h-screen text-xl">Loading...</div>;
   }
 
+  // If user is not authenticated, show login modal
   if (!isAuthenticated) {
-    // Show login/register modal and nothing else if not authenticated
     return (
       <>
         <LoginRegisterModal open={true} />
@@ -40,6 +40,25 @@ const ProtectedRoutes = () => {
     );
   }
 
+  // If user is authenticated and is an admin, redirect to admin dashboard
+  if (user && user.role === "admin") {
+    return (
+      <>
+        <Toaster />
+        <Sonner />
+        <CartProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/admin/*" element={<AdminDashboard />} />
+              <Route path="*" element={<Navigate to="/admin" replace />} />
+            </Routes>
+          </BrowserRouter>
+        </CartProvider>
+      </>
+    );
+  }
+
+  // Regular user routes
   return (
     <>
       <Toaster />
@@ -47,31 +66,7 @@ const ProtectedRoutes = () => {
       <CartProvider>
         <BrowserRouter>
           <Routes>
-            {/* Admin route with role check */}
-            <Route
-              path="/admin/*"
-              element={
-                user && user.role === "admin" ? (
-                  <AdminDashboard />
-                ) : (
-                  <Navigate to="/" replace />
-                )
-              }
-            />
-            
-            {/* Route user to admin panel if they're an admin, otherwise to homepage */}
-            <Route
-              path="/"
-              element={
-                user && user.role === "admin" ? (
-                  <Navigate to="/admin" replace />
-                ) : (
-                  <Index />
-                )
-              }
-            />
-            
-            {/* Regular user routes */}
+            <Route path="/" element={<Index />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/collections" element={<Collections />} />
             <Route path="/account" element={<Account />} />

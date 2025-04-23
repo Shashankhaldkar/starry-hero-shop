@@ -3,8 +3,10 @@ import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mail } from "lucide-react";
+import { Mail, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface LoginFormProps {
   onSwitchToRegister: () => void;
@@ -14,6 +16,7 @@ export const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
   const { loginUser } = useAuth();
   const { toast } = useToast();
   const [form, setForm] = useState({ email: "", password: "" });
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,15 +35,24 @@ export const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
         throw new Error("Email and password are required");
       }
       
-      const result = await loginUser(form.email, form.password);
+      const result = await loginUser(form.email, form.password, isAdmin);
       console.log("Login successful:", result);
+      
+      // Check if user is admin after login to show appropriate toast
+      const isUserAdmin = result && result.role === 'admin';
+      
       toast({
         title: "Login successful",
-        description: "Welcome back to StarryHero!",
+        description: `Welcome back to StarryHero${isUserAdmin ? " Admin" : ""}!`,
       });
     } catch (err: any) {
       console.error("Login error:", err);
       setError(err.message || "Invalid credentials. Please try again!");
+      
+      // Show specific message for admin access denied
+      if (err.message && err.message.includes('admin')) {
+        setError("Not authorized as an admin. Please use regular login.");
+      }
     } finally {
       setLoading(false);
     }
@@ -73,6 +85,19 @@ export const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
         onChange={handleChange}
         className="animate-fade-in"
       />
+      
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="admin-mode"
+          checked={isAdmin}
+          onCheckedChange={setIsAdmin}
+        />
+        <Label htmlFor="admin-mode" className="flex items-center gap-1">
+          <Settings className="h-4 w-4" />
+          Admin Mode
+        </Label>
+      </div>
+
       {error && (
         <div className="text-destructive text-sm animate-shake bg-destructive/10 p-2 rounded">
           {error}
