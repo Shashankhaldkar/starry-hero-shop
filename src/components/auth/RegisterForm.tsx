@@ -3,8 +3,10 @@ import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mail } from "lucide-react";
+import { Mail, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface RegisterFormProps {
   onSwitchToLogin: () => void;
@@ -14,6 +16,7 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
   const { registerUser } = useAuth();
   const { toast } = useToast();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,11 +39,11 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
         throw new Error("Password must be at least 6 characters");
       }
       
-      const result = await registerUser(form.name, form.email, form.password);
+      const result = await registerUser(form.name, form.email, form.password, isAdmin);
       console.log("Registration successful:", result);
       toast({
         title: "Registration successful",
-        description: "Welcome to StarryHero!",
+        description: `Welcome to StarryHero${isAdmin ? " Admin" : ""}!`,
       });
     } catch (err: any) {
       console.error("Registration error:", err);
@@ -86,6 +89,19 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
         onChange={handleChange}
         className="animate-fade-in"
       />
+      
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="admin-mode"
+          checked={isAdmin}
+          onCheckedChange={setIsAdmin}
+        />
+        <Label htmlFor="admin-mode" className="flex items-center gap-1">
+          <Settings className="h-4 w-4" />
+          Admin Mode
+        </Label>
+      </div>
+
       {error && (
         <div className="text-destructive text-sm animate-shake bg-destructive/10 p-2 rounded">
           {error}

@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
 import * as authAPI from "@/api/auth";
 
@@ -6,8 +5,8 @@ interface AuthContextProps {
   user: any;
   loading: boolean;
   isAuthenticated: boolean;
-  loginUser: (email: string, password: string) => Promise<any>;
-  registerUser: (name: string, email: string, password: string) => Promise<any>;
+  loginUser: (email: string, password: string, isAdmin?: boolean) => Promise<any>;
+  registerUser: (name: string, email: string, password: string, isAdmin?: boolean) => Promise<any>;
   logout: () => void;
   setUser: (user: any) => void;
 }
@@ -37,14 +36,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const loginUser = async (email: string, password: string) => {
+  const loginUser = async (email: string, password: string, isAdmin: boolean = false) => {
     if (!email || !password) {
       throw new Error("Email and password are required");
     }
     
     try {
-      console.log("Attempting login with:", { email });
-      const data = await authAPI.login({ email, password });
+      console.log("Attempting login with:", { email, isAdmin });
+      const data = await authAPI.login({ email, password, isAdmin });
       console.log("Login response:", data);
       setUser(data);
       return data;
@@ -54,7 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const registerUserFn = async (name: string, email: string, password: string) => {
+  const registerUserFn = async (name: string, email: string, password: string, isAdmin: boolean = false) => {
     if (!name || !email || !password) {
       throw new Error("All fields are required");
     }
@@ -64,8 +63,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     
     try {
-      console.log("Attempting registration with:", { name, email });
-      const data = await authAPI.register({ name, email, password });
+      console.log("Attempting registration with:", { name, email, isAdmin });
+      const data = await authAPI.register({ name, email, password, isAdmin });
       console.log("Registration response:", data);
       setUser(data);
       return data;
