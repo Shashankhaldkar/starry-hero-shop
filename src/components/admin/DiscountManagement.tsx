@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
@@ -16,11 +15,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Plus, Edit, Trash2, Calendar as CalendarIcon, Percent, Tag, Discount } from "lucide-react";
+import { Plus, Edit, Trash2, Calendar as CalendarIcon, Percent, Tag, Ticket } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 
-// Sample coupons data for demo
 const sampleCoupons = [
   {
     id: "COUPON-001",
@@ -77,14 +75,13 @@ export const DiscountManagement = () => {
   const [selectedCoupon, setSelectedCoupon] = useState<any>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
 
-  // Form states
   const [couponForm, setCouponForm] = useState({
     code: "",
     type: "percentage",
     amount: 0,
     minimumPurchase: 0,
     startDate: new Date(),
-    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     isActive: true
   });
 
@@ -164,7 +161,6 @@ export const DiscountManagement = () => {
   };
 
   const handleAddCoupon = () => {
-    // Add coupon logic would go here
     toast({
       title: "Coupon Added",
       description: `Coupon ${couponForm.code} has been created successfully.`,
@@ -174,7 +170,6 @@ export const DiscountManagement = () => {
   };
 
   const handleUpdateCoupon = () => {
-    // Update coupon logic would go here
     toast({
       title: "Coupon Updated",
       description: `Coupon ${couponForm.code} has been updated successfully.`,
@@ -184,7 +179,6 @@ export const DiscountManagement = () => {
   };
 
   const handleDeleteCoupon = () => {
-    // Delete coupon logic would go here
     toast({
       title: "Coupon Deleted",
       description: `Coupon ${selectedCoupon?.code} has been deleted.`,
@@ -436,7 +430,6 @@ export const DiscountManagement = () => {
         </ScrollArea>
       </Card>
 
-      {/* Edit Coupon Dialog */}
       <Dialog open={isEditCouponOpen} onOpenChange={setIsEditCouponOpen}>
         <DialogContent className="bg-starry-darkPurple text-white border-starry-purple max-w-3xl">
           <DialogHeader>
@@ -453,7 +446,6 @@ export const DiscountManagement = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Confirm Delete Dialog */}
       <Dialog open={isDeleteCouponOpen} onOpenChange={setIsDeleteCouponOpen}>
         <DialogContent className="bg-starry-darkPurple text-white border-starry-purple">
           <DialogHeader>

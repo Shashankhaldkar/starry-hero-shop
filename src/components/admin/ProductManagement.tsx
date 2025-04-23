@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import * as productAPI from "@/api/products";
@@ -27,7 +26,6 @@ export const ProductManagement = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Form for creating/editing product
   const [productForm, setProductForm] = useState({
     name: "",
     description: "",
@@ -43,13 +41,11 @@ export const ProductManagement = () => {
     colors: ["Black", "White", "Red"]
   });
 
-  // Fetch products
   const { data: productData, isLoading, refetch } = useQuery({
     queryKey: ["admin-products"],
     queryFn: () => productAPI.getProducts(),
   });
 
-  // Fetch categories and themes for dropdown options
   const { data: categories } = useQuery({
     queryKey: ["product-categories"],
     queryFn: productAPI.getProductCategories,
@@ -123,7 +119,6 @@ export const ProductManagement = () => {
   };
 
   const handleAddProduct = async () => {
-    // Add implementation would go here - API call to create product
     toast({
       title: "Product Added",
       description: `${productForm.name} has been added successfully.`,
@@ -134,7 +129,6 @@ export const ProductManagement = () => {
   };
 
   const handleUpdateProduct = async () => {
-    // Update implementation would go here - API call to update product
     toast({
       title: "Product Updated",
       description: `${productForm.name} has been updated successfully.`,
@@ -145,7 +139,6 @@ export const ProductManagement = () => {
   };
 
   const handleDeleteProduct = async () => {
-    // Delete implementation would go here - API call to delete product
     toast({
       title: "Product Deleted",
       description: `${selectedProduct?.name} has been deleted.`,
@@ -428,7 +421,7 @@ export const ProductManagement = () => {
                 </TableRow>
               ) : (
                 filteredProducts?.map((product: Product) => (
-                  <TableRow key={product._id} className="hover:bg-starry-darkPurple/60">
+                  <TableRow key={product.id} className="hover:bg-starry-darkPurple/60">
                     <TableCell>
                       <div className="h-12 w-12 rounded-md overflow-hidden bg-gray-200">
                         {product.images && product.images.length > 0 ? (
@@ -495,7 +488,6 @@ export const ProductManagement = () => {
         </ScrollArea>
       </Card>
 
-      {/* Edit Product Dialog */}
       <Dialog open={isEditProductOpen} onOpenChange={setIsEditProductOpen}>
         <DialogContent className="bg-starry-darkPurple text-white border-starry-purple max-w-3xl max-h-[90vh] overflow-auto">
           <DialogHeader>
@@ -512,7 +504,6 @@ export const ProductManagement = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Confirm Delete Dialog */}
       <Dialog open={isDeleteProductOpen} onOpenChange={setIsDeleteProductOpen}>
         <DialogContent className="bg-starry-darkPurple text-white border-starry-purple">
           <DialogHeader>
