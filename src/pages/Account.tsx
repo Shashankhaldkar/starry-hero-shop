@@ -204,192 +204,204 @@ const Account = () => {
           
           {/* Main Content Area */}
           <div className="md:w-3/4">
-            <TabsContent value="profile" className="mt-0" forceMount={activeTab === "profile"}>
-              <Card className="bg-starry-darkPurple/40 border-starry-purple/20 text-white">
-                <CardHeader>
-                  <CardTitle className="flex justify-between items-center">
-                    <span>My Profile</span>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setIsEditing(!isEditing)}
-                      className="border-starry-purple text-starry-purple"
-                    >
-                      {isEditing ? "Cancel" : "Edit Profile"}
-                    </Button>
-                  </CardTitle>
-                  <CardDescription className="text-gray-400">
-                    Manage your personal information
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <Label htmlFor="name">Name</Label>
-                    <Input 
-                      id="name" 
-                      type="text" 
-                      value={name} 
-                      disabled={!isEditing}
-                      onChange={(e) => setName(e.target.value)}
-                      className="bg-starry-darkPurple/60 border-starry-purple/30"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input 
-                      id="email" 
-                      type="email" 
-                      value={email} 
-                      disabled={!isEditing}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="bg-starry-darkPurple/60 border-starry-purple/30"
-                    />
-                  </div>
-                  {isEditing && (
-                    <Button 
-                      onClick={handleUpdateProfile} 
-                      disabled={loading.profile}
-                      className="bg-starry-purple hover:bg-starry-vividPurple w-full"
-                    >
-                      {loading.profile ? "Updating..." : "Save Changes"}
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="orders" className="mt-0" forceMount={activeTab === "orders"}>
-              <Card className="bg-starry-darkPurple/40 border-starry-purple/20 text-white">
-                <CardHeader>
-                  <CardTitle>Order History</CardTitle>
-                  <CardDescription className="text-gray-400">
-                    View your past orders and their status
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {loading.orders ? (
-                    <div className="p-10 text-center">
-                      <p>Loading your orders...</p>
-                    </div>
-                  ) : orders.length > 0 ? (
-                    <div className="space-y-4">
-                      {orders.map((order: any) => (
-                        <div key={order._id} className="border border-starry-purple/20 rounded-lg p-4">
-                          <div className="flex justify-between">
-                            <span>Order #{order._id.substring(0, 8)}</span>
-                            <span className="text-starry-purple">{order.status}</span>
-                          </div>
-                          <div className="text-sm text-gray-400 mt-1">
-                            {new Date(order.createdAt).toLocaleDateString()}
-                          </div>
-                          <div className="mt-2 font-medium">${order.totalPrice.toFixed(2)}</div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-10 text-center">
-                      <Package className="mx-auto h-12 w-12 text-gray-500 mb-3" />
-                      <h3 className="text-lg font-medium mb-1">No Orders Yet</h3>
-                      <p className="text-gray-400">
-                        You haven't placed any orders yet. Start shopping!
-                      </p>
+            {/* Fix 1: Only render the TabsContent if activeTab matches, instead of using forceMount */}
+            {activeTab === "profile" && (
+              <TabsContent value="profile" className="mt-0">
+                <Card className="bg-starry-darkPurple/40 border-starry-purple/20 text-white">
+                  <CardHeader>
+                    <CardTitle className="flex justify-between items-center">
+                      <span>My Profile</span>
                       <Button 
-                        className="mt-4 bg-starry-purple hover:bg-starry-vividPurple"
-                        onClick={() => navigate("/products")}
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setIsEditing(!isEditing)}
+                        className="border-starry-purple text-starry-purple"
                       >
-                        Shop Now
+                        {isEditing ? "Cancel" : "Edit Profile"}
                       </Button>
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Manage your personal information
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div>
+                      <Label htmlFor="name">Name</Label>
+                      <Input 
+                        id="name" 
+                        type="text" 
+                        value={name} 
+                        disabled={!isEditing}
+                        onChange={(e) => setName(e.target.value)}
+                        className="bg-starry-darkPurple/60 border-starry-purple/30"
+                      />
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="wishlist" className="mt-0" forceMount={activeTab === "wishlist"}>
-              <Card className="bg-starry-darkPurple/40 border-starry-purple/20 text-white">
-                <CardHeader>
-                  <CardTitle>My Wishlist</CardTitle>
-                  <CardDescription className="text-gray-400">
-                    Products you've saved for later
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {loading.wishlist ? (
-                    <div className="p-10 text-center">
-                      <p>Loading your wishlist...</p>
+                    <div>
+                      <Label htmlFor="email">Email</Label>
+                      <Input 
+                        id="email" 
+                        type="email" 
+                        value={email} 
+                        disabled={!isEditing}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="bg-starry-darkPurple/60 border-starry-purple/30"
+                      />
                     </div>
-                  ) : wishlist.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {wishlist.map((product: any) => (
-                        <div key={product.id} className="border border-starry-purple/20 rounded-lg p-4 flex">
-                          <div className="w-16 h-16 bg-starry-charcoal/30 rounded overflow-hidden mr-4">
-                            <img 
-                              src={product.images[0]} 
-                              alt={product.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-medium">{product.name}</h4>
-                            <p className="text-sm text-gray-400">${product.price.toFixed(2)}</p>
-                          </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="self-center border-starry-purple/30 text-starry-purple h-8"
-                            onClick={() => navigate(`/product/${product.id}`)}
-                          >
-                            View
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-10 text-center">
-                      <Heart className="mx-auto h-12 w-12 text-gray-500 mb-3" />
-                      <h3 className="text-lg font-medium mb-1">Your Wishlist is Empty</h3>
-                      <p className="text-gray-400">
-                        You haven't added any items to your wishlist yet
-                      </p>
+                    {isEditing && (
                       <Button 
-                        className="mt-4 bg-starry-purple hover:bg-starry-vividPurple"
-                        onClick={() => navigate("/products")}
+                        onClick={handleUpdateProfile} 
+                        disabled={loading.profile}
+                        className="bg-starry-purple hover:bg-starry-vividPurple w-full"
                       >
-                        Browse Products
+                        {loading.profile ? "Updating..." : "Save Changes"}
                       </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
             
-            <TabsContent value="addresses" className="mt-0" forceMount={activeTab === "addresses"}>
-              <Card className="bg-starry-darkPurple/40 border-starry-purple/20 text-white">
-                <CardHeader>
-                  <CardTitle className="flex justify-between items-center">
-                    <span>My Addresses</span>
-                    <Button 
-                      size="sm"
-                      className="bg-starry-purple hover:bg-starry-vividPurple text-white"
-                    >
-                      Add New Address
-                    </Button>
-                  </CardTitle>
-                  <CardDescription className="text-gray-400">
-                    Manage your shipping addresses
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="p-10 text-center">
-                    <Home className="mx-auto h-12 w-12 text-gray-500 mb-3" />
-                    <h3 className="text-lg font-medium mb-1">No Addresses Added</h3>
-                    <p className="text-gray-400">
-                      You haven't added any addresses yet
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+            {/* Fix 2: Do the same for orders tab */}
+            {activeTab === "orders" && (
+              <TabsContent value="orders" className="mt-0">
+                <Card className="bg-starry-darkPurple/40 border-starry-purple/20 text-white">
+                  <CardHeader>
+                    <CardTitle>Order History</CardTitle>
+                    <CardDescription className="text-gray-400">
+                      View your past orders and their status
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {loading.orders ? (
+                      <div className="p-10 text-center">
+                        <p>Loading your orders...</p>
+                      </div>
+                    ) : orders.length > 0 ? (
+                      <div className="space-y-4">
+                        {orders.map((order: any) => (
+                          <div key={order._id} className="border border-starry-purple/20 rounded-lg p-4">
+                            <div className="flex justify-between">
+                              <span>Order #{order._id.substring(0, 8)}</span>
+                              <span className="text-starry-purple">{order.status}</span>
+                            </div>
+                            <div className="text-sm text-gray-400 mt-1">
+                              {new Date(order.createdAt).toLocaleDateString()}
+                            </div>
+                            <div className="mt-2 font-medium">${order.totalPrice.toFixed(2)}</div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-10 text-center">
+                        <Package className="mx-auto h-12 w-12 text-gray-500 mb-3" />
+                        <h3 className="text-lg font-medium mb-1">No Orders Yet</h3>
+                        <p className="text-gray-400">
+                          You haven't placed any orders yet. Start shopping!
+                        </p>
+                        <Button 
+                          className="mt-4 bg-starry-purple hover:bg-starry-vividPurple"
+                          onClick={() => navigate("/products")}
+                        >
+                          Shop Now
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
+            
+            {/* Fix 3: Do the same for wishlist tab */}
+            {activeTab === "wishlist" && (
+              <TabsContent value="wishlist" className="mt-0">
+                <Card className="bg-starry-darkPurple/40 border-starry-purple/20 text-white">
+                  <CardHeader>
+                    <CardTitle>My Wishlist</CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Products you've saved for later
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {loading.wishlist ? (
+                      <div className="p-10 text-center">
+                        <p>Loading your wishlist...</p>
+                      </div>
+                    ) : wishlist.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {wishlist.map((product: any) => (
+                          <div key={product.id} className="border border-starry-purple/20 rounded-lg p-4 flex">
+                            <div className="w-16 h-16 bg-starry-charcoal/30 rounded overflow-hidden mr-4">
+                              <img 
+                                src={product.images[0]} 
+                                alt={product.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-medium">{product.name}</h4>
+                              <p className="text-sm text-gray-400">${product.price.toFixed(2)}</p>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="self-center border-starry-purple/30 text-starry-purple h-8"
+                              onClick={() => navigate(`/product/${product.id}`)}
+                            >
+                              View
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-10 text-center">
+                        <Heart className="mx-auto h-12 w-12 text-gray-500 mb-3" />
+                        <h3 className="text-lg font-medium mb-1">Your Wishlist is Empty</h3>
+                        <p className="text-gray-400">
+                          You haven't added any items to your wishlist yet
+                        </p>
+                        <Button 
+                          className="mt-4 bg-starry-purple hover:bg-starry-vividPurple"
+                          onClick={() => navigate("/products")}
+                        >
+                          Browse Products
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
+            
+            {/* Fix 4: Do the same for addresses tab */}
+            {activeTab === "addresses" && (
+              <TabsContent value="addresses" className="mt-0">
+                <Card className="bg-starry-darkPurple/40 border-starry-purple/20 text-white">
+                  <CardHeader>
+                    <CardTitle className="flex justify-between items-center">
+                      <span>My Addresses</span>
+                      <Button 
+                        size="sm"
+                        className="bg-starry-purple hover:bg-starry-vividPurple text-white"
+                      >
+                        Add New Address
+                      </Button>
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Manage your shipping addresses
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="p-10 text-center">
+                      <Home className="mx-auto h-12 w-12 text-gray-500 mb-3" />
+                      <h3 className="text-lg font-medium mb-1">No Addresses Added</h3>
+                      <p className="text-gray-400">
+                        You haven't added any addresses yet
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
           </div>
         </div>
       </main>
