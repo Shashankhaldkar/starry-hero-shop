@@ -37,9 +37,13 @@ export const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
       
       const result = await loginUser(form.email, form.password, isAdmin);
       console.log("Login successful:", result);
+      
+      // Check if user is admin after login to show appropriate toast
+      const isUserAdmin = result && result.role === 'admin';
+      
       toast({
         title: "Login successful",
-        description: `Welcome back to StarryHero${isAdmin ? " Admin" : ""}!`,
+        description: `Welcome back to StarryHero${isUserAdmin ? " Admin" : ""}!`,
       });
     } catch (err: any) {
       console.error("Login error:", err);

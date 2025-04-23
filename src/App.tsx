@@ -59,7 +59,7 @@ const ProtectedRoutes = () => {
               }
             />
             
-            {/* Route user to admin panel if they're an admin, otherwise to homepage */}
+            {/* Check user role and redirect accordingly */}
             <Route
               path="/"
               element={
@@ -72,14 +72,56 @@ const ProtectedRoutes = () => {
             />
             
             {/* Regular user routes */}
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/collections" element={<Collections />} />
+            <Route path="/shop" element={
+              user && user.role === "admin" ? (
+                <Navigate to="/admin" replace />
+              ) : (
+                <Shop />
+              )
+            } />
+            <Route path="/collections" element={
+              user && user.role === "admin" ? (
+                <Navigate to="/admin" replace />
+              ) : (
+                <Collections />
+              )
+            } />
             <Route path="/account" element={<Account />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/about" element={<About />} />
+            <Route path="/products" element={
+              user && user.role === "admin" ? (
+                <Navigate to="/admin" replace />
+              ) : (
+                <Products />
+              )
+            } />
+            <Route path="/product/:id" element={
+              user && user.role === "admin" ? (
+                <Navigate to="/admin" replace />
+              ) : (
+                <ProductDetail />
+              )
+            } />
+            <Route path="/cart" element={
+              user && user.role === "admin" ? (
+                <Navigate to="/admin" replace />
+              ) : (
+                <Cart />
+              )
+            } />
+            <Route path="/wishlist" element={
+              user && user.role === "admin" ? (
+                <Navigate to="/admin" replace />
+              ) : (
+                <Wishlist />
+              )
+            } />
+            <Route path="/about" element={
+              user && user.role === "admin" ? (
+                <Navigate to="/admin" replace />
+              ) : (
+                <About />
+              )
+            } />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
