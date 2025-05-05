@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import * as productAPI from "@/api/products";
@@ -450,11 +451,11 @@ export const ProductManagement = () => {
                     <TableCell>
                       {product.discountPrice ? (
                         <div>
-                          <span className="line-through text-gray-400">${product.price.toFixed(2)}</span>
-                          <span className="ml-2 text-starry-purple">${product.discountPrice.toFixed(2)}</span>
+                          <span className="line-through text-gray-400">₹{product.price.toFixed(2)}</span>
+                          <span className="ml-2 text-starry-purple">₹{product.discountPrice.toFixed(2)}</span>
                         </div>
                       ) : (
-                        <span>${product.price.toFixed(2)}</span>
+                        <span>₹{product.price.toFixed(2)}</span>
                       )}
                     </TableCell>
                     <TableCell>

@@ -58,7 +58,7 @@ export const OrdersTab = () => {
                 <div className="text-sm text-gray-400 mt-1">
                   {new Date(order.createdAt).toLocaleDateString()}
                 </div>
-                <div className="mt-2 font-medium">${order.totalPrice.toFixed(2)}</div>
+                <div className="mt-2 font-medium">₹{order.totalPrice.toFixed(2)}</div>
               </div>
             ))}
           </div>

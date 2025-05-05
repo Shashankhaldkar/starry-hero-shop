@@ -199,7 +199,7 @@ export const OrderManagement = () => {
                     </TableCell>
                     <TableCell>{order.date}</TableCell>
                     <TableCell>{order.items}</TableCell>
-                    <TableCell>${order.total.toFixed(2)}</TableCell>
+                    <TableCell>₹{order.total.toFixed(2)}</TableCell>
                     <TableCell>
                       <Badge variant={getStatusBadgeVariant(order.status)}>
                         {order.status}
@@ -276,9 +276,9 @@ export const OrderManagement = () => {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>$29.99</TableCell>
+                      <TableCell>₹29.99</TableCell>
                       <TableCell>1</TableCell>
-                      <TableCell>$29.99</TableCell>
+                      <TableCell>₹29.99</TableCell>
                     </TableRow>
                     {selectedOrder?.items > 1 && (
                       <TableRow>
@@ -291,9 +291,9 @@ export const OrderManagement = () => {
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell>$19.99</TableCell>
+                        <TableCell>₹19.99</TableCell>
                         <TableCell>1</TableCell>
-                        <TableCell>$19.99</TableCell>
+                        <TableCell>₹19.99</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
@@ -303,19 +303,19 @@ export const OrderManagement = () => {
               <div className="border border-starry-purple/30 rounded-md p-4">
                 <div className="flex justify-between py-1">
                   <span>Subtotal</span>
-                  <span>${(selectedOrder?.total * 0.8).toFixed(2)}</span>
+                  <span>₹{(selectedOrder?.total * 0.8).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between py-1">
                   <span>Shipping</span>
-                  <span>$5.00</span>
+                  <span>₹5.00</span>
                 </div>
                 <div className="flex justify-between py-1">
                   <span>Tax</span>
-                  <span>${(selectedOrder?.total * 0.1).toFixed(2)}</span>
+                  <span>₹{(selectedOrder?.total * 0.1).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between py-2 font-bold border-t border-starry-purple/30 mt-2">
                   <span>Total</span>
-                  <span>${selectedOrder?.total.toFixed(2)}</span>
+                  <span>₹{selectedOrder?.total.toFixed(2)}</span>
                 </div>
               </div>
             </TabsContent>

@@ -96,7 +96,7 @@ export const products: Product[] = [
     reviewCount: 28,
     inStock: true,
     featured: true,
-    stock: 50  // Added stock property
+    stock: 50
   },
   {
     id: '2',
@@ -115,7 +115,7 @@ export const products: Product[] = [
     reviewCount: 42,
     inStock: true,
     featured: true,
-    stock: 35  // Added stock property
+    stock: 35
   },
   {
     id: '3',
@@ -134,7 +134,7 @@ export const products: Product[] = [
     rating: 4.6,
     reviewCount: 37,
     inStock: true,
-    stock: 40  // Added stock property
+    stock: 40
   },
   {
     id: '4',
@@ -152,7 +152,7 @@ export const products: Product[] = [
     rating: 4.3,
     reviewCount: 18,
     inStock: true,
-    stock: 25  // Added stock property
+    stock: 25
   },
   {
     id: '5',
@@ -170,7 +170,7 @@ export const products: Product[] = [
     rating: 4.7,
     reviewCount: 23,
     inStock: true,
-    stock: 30  // Added stock property
+    stock: 30
   },
   {
     id: '6',
@@ -190,7 +190,7 @@ export const products: Product[] = [
     reviewCount: 48,
     inStock: true,
     featured: true,
-    stock: 45  // Added stock property
+    stock: 45
   },
   {
     id: '7',
@@ -208,7 +208,7 @@ export const products: Product[] = [
     rating: 4.2,
     reviewCount: 15,
     inStock: true,
-    stock: 20  // Added stock property
+    stock: 20
   },
   {
     id: '8',
@@ -226,7 +226,6 @@ export const products: Product[] = [
     rating: 4.4,
     reviewCount: 19,
     inStock: true,
-    stock: 28  // Added stock property
+    stock: 28
   }
 ];
-

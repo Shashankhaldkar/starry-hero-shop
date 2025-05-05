@@ -159,11 +159,11 @@ const Wishlist = () => {
                   <div className="flex items-end gap-2 md:w-32 w-full justify-start md:justify-end">
                     {item.discountPrice ? (
                       <>
-                        <span className="text-lg font-bold">${item.discountPrice.toFixed(2)}</span>
-                        <span className="text-sm text-starry-neutral line-through">${item.price.toFixed(2)}</span>
+                        <span className="text-lg font-bold">₹{item.discountPrice.toFixed(2)}</span>
+                        <span className="text-sm text-starry-neutral line-through">₹{item.price.toFixed(2)}</span>
                       </>
                     ) : (
-                      <span className="text-lg font-bold">${item.price.toFixed(2)}</span>
+                      <span className="text-lg font-bold">₹{item.price.toFixed(2)}</span>
                     )}
                   </div>
                   
