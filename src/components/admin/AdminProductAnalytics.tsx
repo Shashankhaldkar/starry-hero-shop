@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProductManagementForm } from "./ProductManagementForm";
 import { ProductAnalytics } from "./ProductAnalytics";
@@ -17,14 +17,17 @@ export const AdminProductAnalytics = () => {
     queryKey: ['products-analytics'],
     queryFn: async () => {
       try {
-        return await productAPI.getProducts();
+        const data = await productAPI.getProducts();
+        console.log("Fetched products:", data);
+        return data;
       } catch (error) {
+        console.error('Error fetching products:', error);
         toast({
           title: "Failed to fetch products",
           description: "There was an error loading product data",
           variant: "destructive"
         });
-        return { products: [] };
+        return { products: [], pages: 0, page: 1, total: 0 };
       }
     }
   });

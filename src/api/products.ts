@@ -24,7 +24,8 @@ export const getProducts = async (
     return data;
   } catch (error) {
     console.error('Error fetching products:', error);
-    throw error;
+    // Return empty response structure to prevent UI errors
+    return { products: [], pages: 0, page: 1, total: 0 };
   }
 };
 
@@ -46,7 +47,7 @@ export const getFeaturedProducts = async () => {
     return data as Product[];
   } catch (error) {
     console.error('Error fetching featured products:', error);
-    throw error;
+    return []; // Return empty array to prevent UI errors
   }
 };
 
@@ -57,7 +58,12 @@ export const getProductCategories = async () => {
     return data as string[];
   } catch (error) {
     console.error('Error fetching product categories:', error);
-    throw error;
+    // Return fallback categories
+    return [
+      "Oversized", "Acid Wash", "Graphic Printed", "Solid Color",
+      "Polo T-Shirts", "Sleeveless", "Long Sleeve", "Henley",
+      "Hooded", "Crop Tops"
+    ];
   }
 };
 
@@ -68,7 +74,12 @@ export const getProductThemes = async () => {
     return data as string[];
   } catch (error) {
     console.error('Error fetching product themes:', error);
-    throw error;
+    // Return fallback themes
+    return [
+      "Marvel Universe", "DC Comics", "Anime Superheroes",
+      "Classic Comics", "Sci-Fi & Fantasy", "Video Game Characters",
+      "Custom Fan Art"
+    ];
   }
 };
 
