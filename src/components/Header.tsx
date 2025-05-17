@@ -72,6 +72,9 @@ export function Header() {
                 <Link to="/admin/users" className="text-white hover:text-starry-purple transition-colors">
                   Users
                 </Link>
+                <Link to="/admin/discounts" className="text-white hover:text-starry-purple transition-colors">
+                  Discounts
+                </Link>
               </>
             ) : (
               <>
@@ -183,6 +186,9 @@ export function Header() {
                   </Link>
                   <Link to="/admin/users" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
                     Users
+                  </Link>
+                  <Link to="/admin/discounts" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
+                    Discounts
                   </Link>
                 </>
               ) : (

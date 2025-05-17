@@ -49,7 +49,11 @@ const ProtectedRoutes = () => {
         <CartProvider>
           <BrowserRouter>
             <Routes>
-              <Route path="/admin/*" element={<AdminDashboard />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/products" element={<AdminDashboard />} />
+              <Route path="/admin/orders" element={<AdminDashboard />} />
+              <Route path="/admin/users" element={<AdminDashboard />} />
+              <Route path="/admin/discounts" element={<AdminDashboard />} />
               <Route path="*" element={<Navigate to="/admin" replace />} />
             </Routes>
           </BrowserRouter>

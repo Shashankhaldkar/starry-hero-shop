@@ -2,7 +2,7 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/context/AuthContext";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,7 +17,23 @@ import { AdminProductAnalytics } from "@/components/admin/AdminProductAnalytics"
 const AdminDashboard = () => {
   const { user, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
+  const location = useLocation();
   
+  // Set active tab based on current route
+  useEffect(() => {
+    if (location.pathname === "/admin/products") {
+      setActiveTab("products");
+    } else if (location.pathname === "/admin/orders") {
+      setActiveTab("orders");
+    } else if (location.pathname === "/admin/users") {
+      setActiveTab("users");
+    } else if (location.pathname === "/admin/discounts") {
+      setActiveTab("discounts");
+    } else {
+      setActiveTab("overview");
+    }
+  }, [location.pathname]);
+
   // Redirect non-admin users
   if (!isAuthenticated || (user && user.role !== "admin")) {
     return <Navigate to="/" />;
