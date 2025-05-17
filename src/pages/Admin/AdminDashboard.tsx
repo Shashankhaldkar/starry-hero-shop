@@ -6,9 +6,8 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowUpRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import * as productAPI from "@/api/products";
+import * as adminAPI from "@/api/admin";
 import { toast } from "@/components/ui/use-toast";
 
 // Admin panel components
@@ -22,54 +21,25 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const location = useLocation();
   
-  // Fetch dashboard data
-  const { data: productsData, isLoading: productsLoading } = useQuery({
-    queryKey: ['admin-products'],
+  // Fetch dashboard stats
+  const { data: dashboardStats, isLoading: statsLoading } = useQuery({
+    queryKey: ['admin-dashboard-stats'],
     queryFn: async () => {
       try {
-        const response = await productAPI.getProducts();
-        return response;
+        return await adminAPI.getDashboardStats();
       } catch (error) {
         toast({
-          title: "Failed to fetch products",
-          description: "There was an error loading product data",
+          title: "Failed to fetch dashboard stats",
+          description: "There was an error loading dashboard data",
           variant: "destructive"
         });
-        return { products: [], count: 0 };
-      }
-    }
-  });
-  
-  const { data: ordersData, isLoading: ordersLoading } = useQuery({
-    queryKey: ['admin-orders'],
-    queryFn: async () => {
-      try {
-        // This would be replaced with an actual API call to fetch orders data
-        return { orders: [], count: 0 };
-      } catch (error) {
-        toast({
-          title: "Failed to fetch orders",
-          description: "There was an error loading order data",
-          variant: "destructive"
-        });
-        return { orders: [], count: 0 };
-      }
-    }
-  });
-  
-  const { data: usersData, isLoading: usersLoading } = useQuery({
-    queryKey: ['admin-users'],
-    queryFn: async () => {
-      try {
-        // This would be replaced with an actual API call to fetch users data
-        return { users: [], count: 0 };
-      } catch (error) {
-        toast({
-          title: "Failed to fetch users",
-          description: "There was an error loading user data",
-          variant: "destructive"
-        });
-        return { users: [], count: 0 };
+        return { 
+          productCount: 0,
+          orderCount: 0,
+          userCount: 0,
+          recentOrders: [],
+          popularProducts: []
+        };
       }
     }
   });
@@ -94,10 +64,12 @@ const AdminDashboard = () => {
     return <Navigate to="/" />;
   }
 
-  // Calculate statistics
-  const productCount = productsData?.count || 0;
-  const orderCount = ordersData?.count || 0;
-  const userCount = usersData?.count || 0;
+  // Get stats from dashboard data
+  const productCount = dashboardStats?.productCount || 0;
+  const orderCount = dashboardStats?.orderCount || 0;
+  const userCount = dashboardStats?.userCount || 0;
+  const recentOrders = dashboardStats?.recentOrders || [];
+  const popularProducts = dashboardStats?.popularProducts || [];
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-starry-darkPurple to-starry-darkBlue text-white">
@@ -112,7 +84,7 @@ const AdminDashboard = () => {
               <CardDescription className="text-gray-400">Manage your superhero t-shirts</CardDescription>
             </CardHeader>
             <CardContent>
-              {productsLoading ? (
+              {statsLoading ? (
                 <div className="text-2xl font-bold">Loading...</div>
               ) : (
                 <div className="text-2xl font-bold">{productCount}</div>
@@ -126,7 +98,7 @@ const AdminDashboard = () => {
               <CardDescription className="text-gray-400">Track customer orders</CardDescription>
             </CardHeader>
             <CardContent>
-              {ordersLoading ? (
+              {statsLoading ? (
                 <div className="text-2xl font-bold">Loading...</div>
               ) : (
                 <div className="text-2xl font-bold">{orderCount}</div>
@@ -140,7 +112,7 @@ const AdminDashboard = () => {
               <CardDescription className="text-gray-400">Active customer accounts</CardDescription>
             </CardHeader>
             <CardContent>
-              {usersLoading ? (
+              {statsLoading ? (
                 <div className="text-2xl font-bold">Loading...</div>
               ) : (
                 <div className="text-2xl font-bold">{userCount}</div>
@@ -175,10 +147,23 @@ const AdminDashboard = () => {
                   <CardTitle>Recent Orders</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {ordersLoading ? (
+                  {statsLoading ? (
                     <p>Loading recent order data...</p>
-                  ) : orderCount > 0 ? (
-                    <p>Recent order information would be displayed here</p>
+                  ) : recentOrders.length > 0 ? (
+                    <div className="space-y-4">
+                      {recentOrders.map((order) => (
+                        <div key={order._id} className="flex justify-between">
+                          <div>
+                            <div className="font-medium">Order #{order._id.slice(-6)}</div>
+                            <div className="text-sm text-gray-400">{order.user.name}</div>
+                          </div>
+                          <div className="text-right">
+                            <div>₹{order.totalPrice}</div>
+                            <div className="text-sm text-gray-400">{new Date(order.createdAt).toLocaleDateString()}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   ) : (
                     <p>No recent orders found</p>
                   )}
@@ -190,12 +175,22 @@ const AdminDashboard = () => {
                   <CardTitle>Popular Products</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {productsLoading ? (
+                  {statsLoading ? (
                     <p>Loading popular products...</p>
-                  ) : productCount > 0 ? (
-                    <p>Popular product information would be displayed here</p>
+                  ) : popularProducts.length > 0 ? (
+                    <div className="space-y-4">
+                      {popularProducts.map((product) => (
+                        <div key={product._id} className="flex justify-between">
+                          <div className="font-medium truncate" style={{ maxWidth: "200px" }}>{product.name}</div>
+                          <div className="text-right">
+                            <div>₹{product.price}</div>
+                            <div className="text-sm text-gray-400">{product.soldCount} sold</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   ) : (
-                    <p>No products found</p>
+                    <p>No popular products found</p>
                   )}
                 </CardContent>
               </Card>

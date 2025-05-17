@@ -1,31 +1,13 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
-import { products } from "@/data/products";
 import { Product } from "@/types";
-
-// Sample analytics data - in a real app, this would come from your backend
-const salesData = [
-  { name: 'Jan', sales: 12 },
-  { name: 'Feb', sales: 19 },
-  { name: 'Mar', sales: 28 },
-  { name: 'Apr', sales: 21 },
-  { name: 'May', sales: 33 },
-  { name: 'Jun', sales: 42 },
-];
-
-const categorySalesData = [
-  { name: 'Oversized', value: 38 },
-  { name: 'Graphic Printed', value: 25 },
-  { name: 'Solid Color', value: 17 },
-  { name: 'Long Sleeve', value: 10 },
-  { name: 'Hooded', value: 10 },
-];
-
-const COLORS = ['#8B5CF6', '#D946EF', '#F97316', '#0EA5E9', '#10B981'];
+import { useQuery } from "@tanstack/react-query";
+import * as adminAPI from "@/api/admin";
+import { toast } from "@/components/ui/use-toast";
 
 // Define the interface for component props
 interface ProductAnalyticsProps {
@@ -36,6 +18,42 @@ interface ProductAnalyticsProps {
 export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsProps) => {
   const [selectedProduct, setSelectedProduct] = useState("all");
   const [timeRange, setTimeRange] = useState("6months");
+  const [salesData, setSalesData] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
+  const [topProducts, setTopProducts] = useState([]);
+  const [revenueData, setRevenueData] = useState({ total: 0, growth: 0, orders: 0, avgOrderValue: 0 });
+  
+  // Fetch analytics data from the backend
+  const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
+    queryKey: ['product-analytics', selectedProduct, timeRange],
+    queryFn: async () => {
+      try {
+        return await adminAPI.getProductAnalytics(selectedProduct, timeRange);
+      } catch (error) {
+        toast({
+          title: "Failed to fetch analytics",
+          description: "There was an error loading analytics data",
+          variant: "destructive"
+        });
+        return null;
+      }
+    }
+  });
+
+  // Update state when analytics data changes
+  useEffect(() => {
+    if (analyticsData) {
+      setSalesData(analyticsData.salesData || []);
+      setCategoryData(analyticsData.categoryData || []);
+      setTopProducts(analyticsData.topProducts || []);
+      setRevenueData(analyticsData.revenue || { 
+        total: 0, 
+        growth: 0,
+        orders: 0,
+        avgOrderValue: 0 
+      });
+    }
+  }, [analyticsData]);
   
   // Product analytics config
   const productChartConfig = {
@@ -59,8 +77,11 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
     }
   };
 
+  // Colors for pie chart
+  const COLORS = ['#8B5CF6', '#D946EF', '#F97316', '#0EA5E9', '#10B981'];
+
   // Display loading state
-  if (isLoading) {
+  if (isLoading || analyticsLoading) {
     return (
       <div className="space-y-6">
         <Card className="bg-starry-darkPurple/40 border-starry-purple/30 backdrop-blur-sm text-white">
@@ -72,8 +93,8 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
     );
   }
 
-  // Use productData if available, otherwise fallback to the products import
-  const displayProducts = productsData || products;
+  // Use productsData if available
+  const displayProducts = productsData || [];
 
   return (
     <div className="space-y-6">
@@ -176,7 +197,7 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={categorySalesData}
+                    data={categoryData}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
@@ -185,7 +206,7 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
                     dataKey="value"
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   >
-                    {categorySalesData.map((entry, index) => (
+                    {categoryData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -215,21 +236,25 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {displayProducts.slice(0, 5).map((product, index) => (
-                <div key={product.id} className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-starry-purple/30 flex items-center justify-center mr-3">
-                      {index + 1}
+              {topProducts.length > 0 ? (
+                topProducts.map((product, index) => (
+                  <div key={product.id} className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 rounded-full bg-starry-purple/30 flex items-center justify-center mr-3">
+                        {index + 1}
+                      </div>
+                      <div className="truncate" style={{ maxWidth: '180px' }}>
+                        {product.name}
+                      </div>
                     </div>
-                    <div className="truncate" style={{ maxWidth: '180px' }}>
-                      {product.name}
+                    <div className="text-starry-purple font-medium">
+                      ₹{product.revenue}k
                     </div>
                   </div>
-                  <div className="text-starry-purple font-medium">
-                    ₹{(product.price * (Math.random() * 20 + 10)).toFixed(2)}k
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div className="text-center py-6">No product data available</div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -245,20 +270,24 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
           <CardContent>
             <div className="text-center py-8">
               <div className="text-5xl font-bold text-starry-vividPurple mb-2">
-                ₹458,290
+                ₹{revenueData.total.toLocaleString()}
               </div>
               <div className="text-sm text-gray-400">
-                <span className="text-green-400">↑ 12.5%</span> from previous period
+                {revenueData.growth > 0 ? (
+                  <span className="text-green-400">↑ {revenueData.growth}%</span>
+                ) : (
+                  <span className="text-red-400">↓ {Math.abs(revenueData.growth)}%</span>
+                )} from previous period
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div className="p-3 bg-starry-darkPurple/60 rounded-lg">
                 <div className="text-xs text-gray-400">Orders</div>
-                <div className="text-xl font-medium">1,245</div>
+                <div className="text-xl font-medium">{revenueData.orders}</div>
               </div>
               <div className="p-3 bg-starry-darkPurple/60 rounded-lg">
                 <div className="text-xs text-gray-400">Avg. Order Value</div>
-                <div className="text-xl font-medium">₹368.10</div>
+                <div className="text-xl font-medium">₹{revenueData.avgOrderValue}</div>
               </div>
             </div>
           </CardContent>

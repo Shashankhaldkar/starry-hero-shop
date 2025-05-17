@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -10,10 +11,10 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Image, Upload } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useToast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useToast } from "@/components/ui/use-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as productAPI from "@/api/products";
-import { categories, themes } from "@/data/products";
+import * as adminAPI from "@/api/admin";
 import { Product } from "@/types";
 
 type ProductFormValues = {
@@ -38,9 +39,61 @@ interface ProductManagementFormProps {
 
 export const ProductManagementForm = ({ productsData, isLoading }: ProductManagementFormProps) => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const availableSizes = ["XS", "S", "M", "L", "XL", "XXL", "3XL"];
   const availableColors = ["Black", "White", "Red", "Blue", "Green", "Yellow", "Purple"];
+
+  // Fetch categories and themes from the backend
+  const { data: categoriesData } = useQuery({
+    queryKey: ['product-categories'],
+    queryFn: async () => {
+      try {
+        const data = await productAPI.getProductCategories();
+        return data || [];
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        return [];
+      }
+    }
+  });
+
+  const { data: themesData } = useQuery({
+    queryKey: ['product-themes'],
+    queryFn: async () => {
+      try {
+        const data = await productAPI.getProductThemes();
+        return data || [];
+      } catch (error) {
+        console.error('Error fetching themes:', error);
+        return [];
+      }
+    }
+  });
+
+  // Create product mutation
+  const createProductMutation = useMutation({
+    mutationFn: (data: FormData) => adminAPI.createProduct(data),
+    onSuccess: () => {
+      toast({
+        title: "Product Added",
+        description: "Product has been added successfully.",
+      });
+      form.reset();
+      setPreviewImages([]);
+      setImageFiles([]);
+      // Invalidate queries to refresh product data
+      queryClient.invalidateQueries({ queryKey: ['products-analytics'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add product.",
+        variant: "destructive",
+      });
+    }
+  });
 
   const form = useForm<ProductFormValues>({
     defaultValues: {
@@ -62,8 +115,11 @@ export const ProductManagementForm = ({ productsData, isLoading }: ProductManage
     const files = e.target.files;
     if (!files) return;
     
-    // In a real app, you would upload to a server and get URLs back
-    // For this demo, we'll create some placeholder URLs
+    // Store the File objects for later upload
+    const newFiles = Array.from(files);
+    setImageFiles([...imageFiles, ...newFiles]);
+    
+    // Create preview URLs
     const newImages: string[] = [];
     for (let i = 0; i < files.length; i++) {
       newImages.push(URL.createObjectURL(files[i]));
@@ -92,14 +148,26 @@ export const ProductManagementForm = ({ productsData, isLoading }: ProductManage
   };
   
   const onSubmit = (data: ProductFormValues) => {
-    console.log("Product data:", data);
-    // Here you would typically send data to your API
-    toast({
-      title: "Product Added",
-      description: `${data.name} has been added successfully.`,
+    // Create a FormData object to send the product data with images
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("description", data.description);
+    formData.append("price", data.price.toString());
+    if (data.discountPrice) formData.append("discountPrice", data.discountPrice.toString());
+    formData.append("category", data.category);
+    formData.append("theme", data.theme);
+    formData.append("stock", data.stock.toString());
+    formData.append("featured", data.featured.toString());
+    formData.append("sizes", JSON.stringify(data.sizes));
+    formData.append("colors", JSON.stringify(data.colors));
+    
+    // Append all image files
+    imageFiles.forEach((file) => {
+      formData.append("images", file);
     });
-    form.reset();
-    setPreviewImages([]);
+    
+    // Submit the product data to the server
+    createProductMutation.mutate(formData);
   };
 
   // Show loading state if data is loading
@@ -114,6 +182,19 @@ export const ProductManagementForm = ({ productsData, isLoading }: ProductManage
       </Card>
     );
   }
+
+  // Transform categories and themes for select options
+  const categoryOptions = categoriesData || [
+    "Oversized", "Acid Wash", "Graphic Printed", "Solid Color", 
+    "Polo T-Shirts", "Sleeveless", "Long Sleeve", "Henley", 
+    "Hooded", "Crop Tops"
+  ];
+  
+  const themeOptions = themesData || [
+    "Marvel Universe", "DC Comics", "Anime Superheroes", 
+    "Classic Comics", "Sci-Fi & Fantasy", "Video Game Characters", 
+    "Custom Fan Art"
+  ];
 
   return (
     <Card className="bg-starry-darkPurple/40 border-starry-purple/30 backdrop-blur-sm">
@@ -132,6 +213,7 @@ export const ProductManagementForm = ({ productsData, isLoading }: ProductManage
                         <Input 
                           placeholder="Superhero T-Shirt" 
                           {...field} 
+                          className="bg-starry-darkPurple/20 border-starry-purple/30"
                         />
                       </FormControl>
                       <FormMessage />
@@ -149,6 +231,7 @@ export const ProductManagementForm = ({ productsData, isLoading }: ProductManage
                         <Input 
                           type="number"
                           placeholder="999" 
+                          className="bg-starry-darkPurple/20 border-starry-purple/30"
                           {...field}
                           onChange={e => field.onChange(parseFloat(e.target.value))}
                         />
@@ -168,6 +251,7 @@ export const ProductManagementForm = ({ productsData, isLoading }: ProductManage
                         <Input 
                           type="number"
                           placeholder="799"
+                          className="bg-starry-darkPurple/20 border-starry-purple/30"
                           {...field}
                           onChange={e => {
                             const value = e.target.value;
@@ -190,6 +274,7 @@ export const ProductManagementForm = ({ productsData, isLoading }: ProductManage
                         <Input 
                           type="number"
                           placeholder="100" 
+                          className="bg-starry-darkPurple/20 border-starry-purple/30"
                           {...field}
                           onChange={e => field.onChange(parseInt(e.target.value))}
                         />
@@ -210,14 +295,14 @@ export const ProductManagementForm = ({ productsData, isLoading }: ProductManage
                         value={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-starry-darkPurple/20 border-starry-purple/30">
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {categories.map((category) => (
-                            <SelectItem key={category.id} value={category.id}>
-                              {category.name}
+                          {categoryOptions.map((category) => (
+                            <SelectItem key={category} value={category}>
+                              {category}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -238,14 +323,14 @@ export const ProductManagementForm = ({ productsData, isLoading }: ProductManage
                         value={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-starry-darkPurple/20 border-starry-purple/30">
                             <SelectValue placeholder="Select theme" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {themes.map((theme) => (
-                            <SelectItem key={theme.id} value={theme.id}>
-                              {theme.name}
+                          {themeOptions.map((theme) => (
+                            <SelectItem key={theme} value={theme}>
+                              {theme}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -259,7 +344,7 @@ export const ProductManagementForm = ({ productsData, isLoading }: ProductManage
                   control={form.control}
                   name="featured"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border border-starry-purple/30 p-3 shadow-sm">
                       <div className="space-y-0.5">
                         <FormLabel>Featured Product</FormLabel>
                       </div>
@@ -284,7 +369,7 @@ export const ProductManagementForm = ({ productsData, isLoading }: ProductManage
                       <FormControl>
                         <Textarea 
                           placeholder="Enter product description" 
-                          className="min-h-[150px]"
+                          className="min-h-[150px] bg-starry-darkPurple/20 border-starry-purple/30"
                           {...field} 
                         />
                       </FormControl>
@@ -361,8 +446,18 @@ export const ProductManagementForm = ({ productsData, isLoading }: ProductManage
             </div>
             
             <div className="flex justify-end">
-              <Button type="submit" className="bg-starry-purple hover:bg-starry-vividPurple">
-                <Plus className="mr-2 h-4 w-4" /> Add Product
+              <Button 
+                type="submit" 
+                className="bg-starry-purple hover:bg-starry-vividPurple"
+                disabled={createProductMutation.isPending}
+              >
+                {createProductMutation.isPending ? (
+                  <span>Adding...</span>
+                ) : (
+                  <>
+                    <Plus className="mr-2 h-4 w-4" /> Add Product
+                  </>
+                )}
               </Button>
             </div>
           </form>

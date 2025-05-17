@@ -1,5 +1,8 @@
+
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
 import * as authAPI from "@/api/auth";
+import { useNavigate } from "react-router-dom";
+import { toast } from "@/components/ui/use-toast";
 
 interface AuthContextProps {
   user: any;
@@ -46,9 +49,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const data = await authAPI.login({ email, password, isAdmin });
       console.log("Login response:", data);
       setUser(data);
+      toast({
+        title: "Login successful",
+        description: `Welcome back, ${data.name}!`
+      });
       return data;
     } catch (error) {
       console.error("Login error in context:", error);
+      toast({
+        title: "Login failed",
+        description: error.message || "Invalid credentials",
+        variant: "destructive"
+      });
       throw error;
     }
   };
@@ -67,16 +79,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const data = await authAPI.register({ name, email, password, isAdmin });
       console.log("Registration response:", data);
       setUser(data);
+      toast({
+        title: "Registration successful",
+        description: `Welcome, ${data.name}!`
+      });
       return data;
     } catch (error) {
       console.error("Registration error in context:", error);
+      toast({
+        title: "Registration failed",
+        description: error.message || "Registration failed",
+        variant: "destructive"
+      });
       throw error;
     }
   };
 
   const logoutFn = () => {
-    authAPI.logout();
-    setUser(null);
+    try {
+      authAPI.logout();
+      setUser(null);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      toast({
+        title: "Logout successful",
+        description: "You've been logged out successfully"
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Logout failed",
+        description: "There was an error logging out",
+        variant: "destructive"
+      });
+    }
   };
 
   return (

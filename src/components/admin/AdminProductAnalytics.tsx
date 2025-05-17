@@ -1,18 +1,19 @@
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProductManagementForm } from "./ProductManagementForm";
 import { ProductAnalytics } from "./ProductAnalytics";
 import { useQuery } from "@tanstack/react-query";
 import * as productAPI from "@/api/products";
+import * as adminAPI from "@/api/admin";
 import { toast } from "@/components/ui/use-toast";
 
 export const AdminProductAnalytics = () => {
   const [activeTab, setActiveTab] = useState("manage");
   
   // Fetch product data
-  const { data: productsData, isLoading } = useQuery({
+  const { data: productsData, isLoading: productsLoading } = useQuery({
     queryKey: ['products-analytics'],
     queryFn: async () => {
       try {
@@ -43,11 +44,11 @@ export const AdminProductAnalytics = () => {
         </TabsList>
         
         <TabsContent value="manage">
-          <ProductManagementForm productsData={productsData?.products} isLoading={isLoading} />
+          <ProductManagementForm productsData={productsData?.products} isLoading={productsLoading} />
         </TabsContent>
         
         <TabsContent value="analytics">
-          <ProductAnalytics productsData={productsData?.products} isLoading={isLoading} />
+          <ProductAnalytics productsData={productsData?.products} isLoading={productsLoading} />
         </TabsContent>
       </Tabs>
     </div>

@@ -88,9 +88,9 @@ export const deleteProduct = async (productId: string) => {
 };
 
 // Get product analytics
-export const getProductAnalytics = async () => {
+export const getProductAnalytics = async (productId: string = 'all', timeRange: string = '6months') => {
   try {
-    const { data } = await API.get('/admin/analytics/products');
+    const { data } = await API.get(`/admin/analytics/products?productId=${productId}&timeRange=${timeRange}`);
     return data;
   } catch (error) {
     console.error('Error fetching product analytics:', error);

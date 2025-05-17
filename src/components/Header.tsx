@@ -64,23 +64,7 @@ export function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {isAdmin ? (
-              <>
-                <Link to="/admin" className="text-white hover:text-starry-purple transition-colors">
-                  Dashboard
-                </Link>
-                <Link to="/admin/products" className="text-white hover:text-starry-purple transition-colors">
-                  Products
-                </Link>
-                <Link to="/admin/orders" className="text-white hover:text-starry-purple transition-colors">
-                  Orders
-                </Link>
-                <Link to="/admin/users" className="text-white hover:text-starry-purple transition-colors">
-                  Users
-                </Link>
-                <Link to="/admin/discounts" className="text-white hover:text-starry-purple transition-colors">
-                  Discounts
-                </Link>
-              </>
+              <></>
             ) : (
               <>
                 <Link to="/" className="text-white hover:text-starry-purple transition-colors">
@@ -101,47 +85,49 @@ export function Header() {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            {isSearchOpen ? (
-              <form onSubmit={handleSearchSubmit} className="relative animate-fade-in">
-                <Input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-56 bg-starry-darkPurple/50 border-starry-purple/30 text-white focus:border-starry-purple"
-                  autoFocus
-                />
-                <Button 
-                  type="button" 
-                  variant="ghost" 
-                  size="icon" 
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-white hover:text-starry-purple"
-                  onClick={toggleSearch}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </form>
-            ) : (
-              <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple hover:bg-starry-darkPurple/20" onClick={toggleSearch}>
-                <Search className="h-5 w-5" />
-              </Button>
-            )}
-            <Link to="/account">
-              <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple hover:bg-starry-darkPurple/20">
-                <User className="h-5 w-5" />
-              </Button>
-            </Link>
             {!isAdmin && (
-              <Link to="/cart">
-                <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple hover:bg-starry-darkPurple/20 relative">
-                  <ShoppingCart className="h-5 w-5" />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-starry-orange text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                      {cartCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
+              <>
+                {isSearchOpen ? (
+                  <form onSubmit={handleSearchSubmit} className="relative animate-fade-in">
+                    <Input
+                      type="text"
+                      placeholder="Search products..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-56 bg-starry-darkPurple/50 border-starry-purple/30 text-white focus:border-starry-purple"
+                      autoFocus
+                    />
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="icon" 
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-white hover:text-starry-purple"
+                      onClick={toggleSearch}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </form>
+                ) : (
+                  <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple hover:bg-starry-darkPurple/20" onClick={toggleSearch}>
+                    <Search className="h-5 w-5" />
+                  </Button>
+                )}
+                <Link to="/account">
+                  <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple hover:bg-starry-darkPurple/20">
+                    <User className="h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link to="/cart">
+                  <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple hover:bg-starry-darkPurple/20 relative">
+                    <ShoppingCart className="h-5 w-5" />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-starry-orange text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                        {cartCount}
+                      </span>
+                    )}
+                  </Button>
+                </Link>
+              </>
             )}
             <Button 
               variant="ghost" 
@@ -165,45 +151,31 @@ export function Header() {
         {isMenuOpen && (
           <div className="md:hidden pt-4 pb-6 space-y-4">
             {/* Mobile Search */}
-            <form onSubmit={handleSearchSubmit} className="mb-4">
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-starry-darkPurple/50 border-starry-purple/30 text-white"
-                />
-                <Button 
-                  type="submit" 
-                  variant="ghost" 
-                  size="icon" 
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-white"
-                >
-                  <Search className="h-4 w-4" />
-                </Button>
-              </div>
-            </form>
+            {!isAdmin && (
+              <form onSubmit={handleSearchSubmit} className="mb-4">
+                <div className="relative">
+                  <Input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-starry-darkPurple/50 border-starry-purple/30 text-white"
+                  />
+                  <Button 
+                    type="submit" 
+                    variant="ghost" 
+                    size="icon" 
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-white"
+                  >
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </div>
+              </form>
+            )}
             
             <nav className="flex flex-col space-y-4">
               {isAdmin ? (
-                <>
-                  <Link to="/admin" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
-                    Dashboard
-                  </Link>
-                  <Link to="/admin/products" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
-                    Products
-                  </Link>
-                  <Link to="/admin/orders" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
-                    Orders
-                  </Link>
-                  <Link to="/admin/users" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
-                    Users
-                  </Link>
-                  <Link to="/admin/discounts" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
-                    Discounts
-                  </Link>
-                </>
+                <></>
               ) : (
                 <>
                   <Link to="/" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
@@ -222,22 +194,24 @@ export function Header() {
               )}
             </nav>
             <div className="flex items-center space-x-4 pt-4 border-t border-starry-darkPurple/20">
-              <Link to="/account">
-                <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple">
-                  <User className="h-5 w-5" />
-                </Button>
-              </Link>
               {!isAdmin && (
-                <Link to="/cart">
-                  <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple relative">
-                    <ShoppingCart className="h-5 w-5" />
-                    {cartCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-starry-orange text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                        {cartCount}
-                      </span>
-                    )}
-                  </Button>
-                </Link>
+                <>
+                  <Link to="/account">
+                    <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple">
+                      <User className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Link to="/cart">
+                    <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple relative">
+                      <ShoppingCart className="h-5 w-5" />
+                      {cartCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-starry-orange text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                          {cartCount}
+                        </span>
+                      )}
+                    </Button>
+                  </Link>
+                </>
               )}
               <Button 
                 variant="ghost" 
