@@ -7,6 +7,9 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowUpRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import * as productAPI from "@/api/products";
+import { toast } from "@/components/ui/use-toast";
 
 // Admin panel components
 import { OrderManagement } from "@/components/admin/OrderManagement";
@@ -18,6 +21,58 @@ const AdminDashboard = () => {
   const { user, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
   const location = useLocation();
+  
+  // Fetch dashboard data
+  const { data: productsData, isLoading: productsLoading } = useQuery({
+    queryKey: ['admin-products'],
+    queryFn: async () => {
+      try {
+        const response = await productAPI.getProducts();
+        return response;
+      } catch (error) {
+        toast({
+          title: "Failed to fetch products",
+          description: "There was an error loading product data",
+          variant: "destructive"
+        });
+        return { products: [], count: 0 };
+      }
+    }
+  });
+  
+  const { data: ordersData, isLoading: ordersLoading } = useQuery({
+    queryKey: ['admin-orders'],
+    queryFn: async () => {
+      try {
+        // This would be replaced with an actual API call to fetch orders data
+        return { orders: [], count: 0 };
+      } catch (error) {
+        toast({
+          title: "Failed to fetch orders",
+          description: "There was an error loading order data",
+          variant: "destructive"
+        });
+        return { orders: [], count: 0 };
+      }
+    }
+  });
+  
+  const { data: usersData, isLoading: usersLoading } = useQuery({
+    queryKey: ['admin-users'],
+    queryFn: async () => {
+      try {
+        // This would be replaced with an actual API call to fetch users data
+        return { users: [], count: 0 };
+      } catch (error) {
+        toast({
+          title: "Failed to fetch users",
+          description: "There was an error loading user data",
+          variant: "destructive"
+        });
+        return { users: [], count: 0 };
+      }
+    }
+  });
   
   // Set active tab based on current route
   useEffect(() => {
@@ -39,6 +94,11 @@ const AdminDashboard = () => {
     return <Navigate to="/" />;
   }
 
+  // Calculate statistics
+  const productCount = productsData?.count || 0;
+  const orderCount = ordersData?.count || 0;
+  const userCount = usersData?.count || 0;
+  
   return (
     <div className="min-h-screen bg-gradient-to-b from-starry-darkPurple to-starry-darkBlue text-white">
       <Header />
@@ -52,11 +112,11 @@ const AdminDashboard = () => {
               <CardDescription className="text-gray-400">Manage your superhero t-shirts</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">124</div>
-              <div className="text-xs text-gray-400 flex items-center mt-1">
-                <ArrowUpRight className="h-3 w-3 mr-1 text-green-400" />
-                <span className="text-green-400">+8%</span> from last month
-              </div>
+              {productsLoading ? (
+                <div className="text-2xl font-bold">Loading...</div>
+              ) : (
+                <div className="text-2xl font-bold">{productCount}</div>
+              )}
             </CardContent>
           </Card>
           
@@ -66,11 +126,11 @@ const AdminDashboard = () => {
               <CardDescription className="text-gray-400">Track customer orders</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">32</div>
-              <div className="text-xs text-gray-400 flex items-center mt-1">
-                <ArrowUpRight className="h-3 w-3 mr-1 text-green-400" />
-                <span className="text-green-400">+12%</span> from last month
-              </div>
+              {ordersLoading ? (
+                <div className="text-2xl font-bold">Loading...</div>
+              ) : (
+                <div className="text-2xl font-bold">{orderCount}</div>
+              )}
             </CardContent>
           </Card>
           
@@ -80,11 +140,11 @@ const AdminDashboard = () => {
               <CardDescription className="text-gray-400">Active customer accounts</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">287</div>
-              <div className="text-xs text-gray-400 flex items-center mt-1">
-                <ArrowUpRight className="h-3 w-3 mr-1 text-green-400" />
-                <span className="text-green-400">+15%</span> from last month
-              </div>
+              {usersLoading ? (
+                <div className="text-2xl font-bold">Loading...</div>
+              ) : (
+                <div className="text-2xl font-bold">{userCount}</div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -115,7 +175,13 @@ const AdminDashboard = () => {
                   <CardTitle>Recent Orders</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p>Recent order stats and charts will go here</p>
+                  {ordersLoading ? (
+                    <p>Loading recent order data...</p>
+                  ) : orderCount > 0 ? (
+                    <p>Recent order information would be displayed here</p>
+                  ) : (
+                    <p>No recent orders found</p>
+                  )}
                 </CardContent>
               </Card>
               
@@ -124,7 +190,13 @@ const AdminDashboard = () => {
                   <CardTitle>Popular Products</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p>Popular product stats and charts will go here</p>
+                  {productsLoading ? (
+                    <p>Loading popular products...</p>
+                  ) : productCount > 0 ? (
+                    <p>Popular product information would be displayed here</p>
+                  ) : (
+                    <p>No products found</p>
+                  )}
                 </CardContent>
               </Card>
             </div>

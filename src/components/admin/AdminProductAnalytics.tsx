@@ -2,13 +2,31 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChartContainer } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { ProductManagementForm } from "./ProductManagementForm";
 import { ProductAnalytics } from "./ProductAnalytics";
+import { useQuery } from "@tanstack/react-query";
+import * as productAPI from "@/api/products";
+import { toast } from "@/components/ui/use-toast";
 
 export const AdminProductAnalytics = () => {
   const [activeTab, setActiveTab] = useState("manage");
+  
+  // Fetch product data
+  const { data: productsData, isLoading } = useQuery({
+    queryKey: ['products-analytics'],
+    queryFn: async () => {
+      try {
+        return await productAPI.getProducts();
+      } catch (error) {
+        toast({
+          title: "Failed to fetch products",
+          description: "There was an error loading product data",
+          variant: "destructive"
+        });
+        return { products: [] };
+      }
+    }
+  });
 
   return (
     <div className="space-y-6">
@@ -25,11 +43,11 @@ export const AdminProductAnalytics = () => {
         </TabsList>
         
         <TabsContent value="manage">
-          <ProductManagementForm />
+          <ProductManagementForm productsData={productsData?.products} isLoading={isLoading} />
         </TabsContent>
         
         <TabsContent value="analytics">
-          <ProductAnalytics />
+          <ProductAnalytics productsData={productsData?.products} isLoading={isLoading} />
         </TabsContent>
       </Tabs>
     </div>

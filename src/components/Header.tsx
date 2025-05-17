@@ -1,13 +1,13 @@
 
 import { useState, useEffect } from 'react';
-import { ShoppingCart, User, Search, Menu, X } from 'lucide-react';
+import { ShoppingCart, User, Search, Menu, X, LogOut } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 
 export function Header() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,6 +41,11 @@ export function Header() {
 
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   return (
@@ -138,6 +143,14 @@ export function Header() {
                 </Button>
               </Link>
             )}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-white hover:text-starry-purple hover:bg-starry-darkPurple/20"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-5 w-5" />
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -226,6 +239,14 @@ export function Header() {
                   </Button>
                 </Link>
               )}
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="text-white hover:text-starry-purple"
+                onClick={handleLogout}
+              >
+                <LogOut className="h-5 w-5" />
+              </Button>
             </div>
           </div>
         )}
