@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import * as productAPI from "@/api/products";
 import { categories, themes } from "@/data/products";
+import { Product } from "@/types";
 
 type ProductFormValues = {
   name: string;
@@ -30,7 +30,13 @@ type ProductFormValues = {
   images: string[];
 };
 
-export const ProductManagementForm = () => {
+// Add proper type definition for the component props
+interface ProductManagementFormProps {
+  productsData?: Product[];
+  isLoading?: boolean;
+}
+
+export const ProductManagementForm = ({ productsData, isLoading }: ProductManagementFormProps) => {
   const { toast } = useToast();
   const [previewImages, setPreviewImages] = useState<string[]>([]);
   const availableSizes = ["XS", "S", "M", "L", "XL", "XXL", "3XL"];
@@ -95,6 +101,19 @@ export const ProductManagementForm = () => {
     form.reset();
     setPreviewImages([]);
   };
+
+  // Show loading state if data is loading
+  if (isLoading) {
+    return (
+      <Card className="bg-starry-darkPurple/40 border-starry-purple/30 backdrop-blur-sm">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center h-64">
+            <p className="text-white">Loading product data...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="bg-starry-darkPurple/40 border-starry-purple/30 backdrop-blur-sm">

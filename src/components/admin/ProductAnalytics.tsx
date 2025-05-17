@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
 import { products } from "@/data/products";
+import { Product } from "@/types";
 
 // Sample analytics data - in a real app, this would come from your backend
 const salesData = [
@@ -26,7 +27,13 @@ const categorySalesData = [
 
 const COLORS = ['#8B5CF6', '#D946EF', '#F97316', '#0EA5E9', '#10B981'];
 
-export const ProductAnalytics = () => {
+// Define the interface for component props
+interface ProductAnalyticsProps {
+  productsData?: Product[];
+  isLoading?: boolean;
+}
+
+export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsProps) => {
   const [selectedProduct, setSelectedProduct] = useState("all");
   const [timeRange, setTimeRange] = useState("6months");
   
@@ -52,6 +59,22 @@ export const ProductAnalytics = () => {
     }
   };
 
+  // Display loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Card className="bg-starry-darkPurple/40 border-starry-purple/30 backdrop-blur-sm text-white">
+          <CardContent className="flex items-center justify-center h-64">
+            <p>Loading analytics data...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Use productData if available, otherwise fallback to the products import
+  const displayProducts = productsData || products;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row gap-4 md:items-center justify-between">
@@ -66,7 +89,7 @@ export const ProductAnalytics = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Products</SelectItem>
-                {products.map((product) => (
+                {displayProducts.map((product) => (
                   <SelectItem key={product.id} value={product.id}>
                     {product.name}
                   </SelectItem>
@@ -192,7 +215,7 @@ export const ProductAnalytics = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {products.slice(0, 5).map((product, index) => (
+              {displayProducts.slice(0, 5).map((product, index) => (
                 <div key={product.id} className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="w-8 h-8 rounded-full bg-starry-purple/30 flex items-center justify-center mr-3">
