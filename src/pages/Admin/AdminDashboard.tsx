@@ -9,10 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowUpRight } from "lucide-react";
 
 // Admin panel components
-import { ProductManagement } from "@/components/admin/ProductManagement";
 import { OrderManagement } from "@/components/admin/OrderManagement";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { DiscountManagement } from "@/components/admin/DiscountManagement";
+import { AdminProductAnalytics } from "@/components/admin/AdminProductAnalytics";
 
 const AdminDashboard = () => {
   const { user, isAuthenticated } = useAuth();
@@ -115,7 +115,7 @@ const AdminDashboard = () => {
           </TabsContent>
           
           <TabsContent value="products">
-            <ProductManagement />
+            <AdminProductAnalytics />
           </TabsContent>
           
           <TabsContent value="orders">
