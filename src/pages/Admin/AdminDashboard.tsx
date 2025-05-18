@@ -14,12 +14,20 @@ import {
   ShoppingBag, 
   Users, 
   Tag, 
-  ArrowUpIcon, 
-  ArrowDownIcon,
-  TrendingUp,
-  LineChart
+  ArrowUp, 
+  ArrowDown
 } from "lucide-react";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Line, LineChart as RechartsLineChart } from "recharts";
+import { 
+  ResponsiveContainer, 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Line, 
+  LineChart
+} from "recharts";
 
 // Admin panel components
 import { OrderManagement } from "@/components/admin/OrderManagement";
@@ -116,18 +124,18 @@ const AdminDashboard = () => {
   };
   
   const StatCard = ({ title, value, icon, growth }: { title: string, value: number, icon: React.ReactNode, growth?: number }) => (
-    <Card className="bg-dark-900/90 border-dark-700">
+    <Card className="bg-admin-darkGrey/90 border-admin-grey/30">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-dark-100 text-lg">{title}</CardTitle>
-        <div className="h-8 w-8 rounded-lg bg-dark-800 flex items-center justify-center">
+        <CardTitle className="text-admin-white text-lg">{title}</CardTitle>
+        <div className="h-8 w-8 rounded-lg bg-admin-darkGrey flex items-center justify-center">
           {icon}
         </div>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold mb-1">{value}</div>
+        <div className="text-2xl font-bold mb-1 text-white">{value}</div>
         {growth !== undefined && (
           <div className={`text-sm flex items-center ${growth >= 0 ? "text-green-500" : "text-red-500"}`}>
-            {growth >= 0 ? <ArrowUpIcon className="h-3 w-3 mr-1" /> : <ArrowDownIcon className="h-3 w-3 mr-1" />}
+            {growth >= 0 ? <ArrowUp className="h-3 w-3 mr-1" /> : <ArrowDown className="h-3 w-3 mr-1" />}
             {Math.abs(growth)}% from last month
           </div>
         )}
@@ -146,57 +154,57 @@ const AdminDashboard = () => {
   ];
   
   return (
-    <div className="min-h-screen bg-dark-950">
+    <div className="min-h-screen bg-admin-black">
       <Header />
       <main className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold mb-8 text-gradient">Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-8 admin-text-gradient">Admin Dashboard</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <StatCard 
             title="Products" 
             value={productCount} 
-            icon={<ShoppingBag className="h-4 w-4 text-dark-400" />}
+            icon={<ShoppingBag className="h-4 w-4 text-admin-accent" />}
             growth={growthData.products}
           />
           <StatCard 
             title="Orders" 
             value={orderCount} 
-            icon={<ShoppingBag className="h-4 w-4 text-dark-400" />}
+            icon={<ShoppingBag className="h-4 w-4 text-admin-accent" />}
             growth={growthData.orders}
           />
           <StatCard 
             title="Users" 
             value={userCount} 
-            icon={<Users className="h-4 w-4 text-dark-400" />}
+            icon={<Users className="h-4 w-4 text-admin-accent" />}
             growth={growthData.users}
           />
           <StatCard 
             title="Revenue" 
             value={salesData.reduce((sum, item) => sum + (item.revenue || 0), 0)} 
-            icon={<TrendingUp className="h-4 w-4 text-dark-400" />}
+            icon={<Tag className="h-4 w-4 text-admin-accent" />}
             growth={growthData.revenue}
           />
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-dark-900 border border-dark-800 rounded-lg p-1 mb-6">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-dark-700 data-[state=active]:text-dark-100">
+          <TabsList className="bg-admin-darkGrey/40 border border-admin-grey/30 rounded-lg p-1 mb-6">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-admin-grey text-white">
               <LayoutDashboard className="h-4 w-4 mr-2" />
               Overview
             </TabsTrigger>
-            <TabsTrigger value="products" className="data-[state=active]:bg-dark-700 data-[state=active]:text-dark-100">
+            <TabsTrigger value="products" className="data-[state=active]:bg-admin-grey text-white">
               <ShoppingBag className="h-4 w-4 mr-2" />
               Products
             </TabsTrigger>
-            <TabsTrigger value="orders" className="data-[state=active]:bg-dark-700 data-[state=active]:text-dark-100">
+            <TabsTrigger value="orders" className="data-[state=active]:bg-admin-grey text-white">
               <ShoppingBag className="h-4 w-4 mr-2" />
               Orders
             </TabsTrigger>
-            <TabsTrigger value="users" className="data-[state=active]:bg-dark-700 data-[state=active]:text-dark-100">
+            <TabsTrigger value="users" className="data-[state=active]:bg-admin-grey text-white">
               <Users className="h-4 w-4 mr-2" />
               Users
             </TabsTrigger>
-            <TabsTrigger value="discounts" className="data-[state=active]:bg-dark-700 data-[state=active]:text-dark-100">
+            <TabsTrigger value="discounts" className="data-[state=active]:bg-admin-grey text-white">
               <Tag className="h-4 w-4 mr-2" />
               Discounts
             </TabsTrigger>
@@ -205,10 +213,10 @@ const AdminDashboard = () => {
           <TabsContent value="overview">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {/* Sales Chart */}
-              <Card className="bg-dark-900 border-dark-700 lg:col-span-2">
+              <Card className="bg-admin-darkGrey/80 border-admin-grey/30 lg:col-span-2">
                 <CardHeader>
-                  <CardTitle>Sales Overview</CardTitle>
-                  <CardDescription className="text-dark-400">Monthly sales and revenue</CardDescription>
+                  <CardTitle className="text-white">Sales Overview</CardTitle>
+                  <CardDescription className="text-admin-softGrey">Monthly sales and revenue</CardDescription>
                 </CardHeader>
                 <CardContent className="h-80">
                   {salesData.length > 0 ? (
@@ -230,78 +238,78 @@ const AdminDashboard = () => {
                     </ResponsiveContainer>
                   ) : (
                     <div className="h-full flex items-center justify-center">
-                      <p className="text-dark-400">No sales data available</p>
+                      <p className="text-admin-softGrey">No sales data available</p>
                     </div>
                   )}
                 </CardContent>
               </Card>
               
               {/* Recent Orders */}
-              <Card className="bg-dark-900 border-dark-700 h-[400px]">
+              <Card className="bg-admin-darkGrey/80 border-admin-grey/30 h-[400px]">
                 <CardHeader>
-                  <CardTitle>Recent Orders</CardTitle>
-                  <CardDescription className="text-dark-400">Latest transactions</CardDescription>
+                  <CardTitle className="text-white">Recent Orders</CardTitle>
+                  <CardDescription className="text-admin-softGrey">Latest transactions</CardDescription>
                 </CardHeader>
                 <CardContent className="overflow-auto max-h-[300px]">
                   {statsLoading ? (
-                    <p>Loading recent orders...</p>
+                    <p className="text-admin-softGrey">Loading recent orders...</p>
                   ) : recentOrders.length > 0 ? (
                     <div className="space-y-4">
                       {recentOrders.map((order) => (
-                        <div key={order._id} className="flex justify-between border-b border-dark-800 pb-3">
+                        <div key={order._id} className="flex justify-between border-b border-admin-grey/30 pb-3">
                           <div>
-                            <div className="font-medium">#{order._id.slice(-6)}</div>
-                            <div className="text-sm text-dark-400">{order.user?.name || 'Unknown'}</div>
+                            <div className="font-medium text-white">#{order._id.slice(-6)}</div>
+                            <div className="text-sm text-admin-softGrey">{order.user?.name || 'Unknown'}</div>
                           </div>
                           <div className="text-right">
-                            <div>₹{order.totalPrice}</div>
-                            <div className="text-sm text-dark-400">{new Date(order.createdAt).toLocaleDateString()}</div>
+                            <div className="text-white">₹{order.totalPrice}</div>
+                            <div className="text-sm text-admin-softGrey">{new Date(order.createdAt).toLocaleDateString()}</div>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-center text-dark-400 mt-6">No recent orders found</p>
+                    <p className="text-center text-admin-softGrey mt-6">No recent orders found</p>
                   )}
                 </CardContent>
               </Card>
               
               {/* Popular Products */}
-              <Card className="bg-dark-900 border-dark-700">
+              <Card className="bg-admin-darkGrey/80 border-admin-grey/30">
                 <CardHeader>
-                  <CardTitle>Popular Products</CardTitle>
-                  <CardDescription className="text-dark-400">Best selling items</CardDescription>
+                  <CardTitle className="text-white">Popular Products</CardTitle>
+                  <CardDescription className="text-admin-softGrey">Best selling items</CardDescription>
                 </CardHeader>
                 <CardContent className="overflow-auto max-h-[250px]">
                   {statsLoading ? (
-                    <p>Loading popular products...</p>
+                    <p className="text-admin-softGrey">Loading popular products...</p>
                   ) : popularProducts.length > 0 ? (
                     <div className="space-y-4">
                       {popularProducts.map((product) => (
-                        <div key={product._id} className="flex justify-between border-b border-dark-800 pb-3">
-                          <div className="font-medium truncate max-w-[200px]">{product.name}</div>
+                        <div key={product._id} className="flex justify-between border-b border-admin-grey/30 pb-3">
+                          <div className="font-medium truncate max-w-[200px] text-white">{product.name}</div>
                           <div className="text-right">
-                            <div>₹{product.price}</div>
-                            <div className="text-sm text-dark-400">{product.soldCount || 0} sold</div>
+                            <div className="text-white">₹{product.price}</div>
+                            <div className="text-sm text-admin-softGrey">{product.soldCount || 0} sold</div>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-center text-dark-400 mt-6">No popular products found</p>
+                    <p className="text-center text-admin-softGrey mt-6">No popular products found</p>
                   )}
                 </CardContent>
               </Card>
               
               {/* Customer Growth */}
-              <Card className="bg-dark-900 border-dark-700 col-span-1 md:col-span-2">
+              <Card className="bg-admin-darkGrey/80 border-admin-grey/30 col-span-1 md:col-span-2">
                 <CardHeader>
-                  <CardTitle>Customer Growth</CardTitle>
-                  <CardDescription className="text-dark-400">User acquisition trend</CardDescription>
+                  <CardTitle className="text-white">Customer Growth</CardTitle>
+                  <CardDescription className="text-admin-softGrey">User acquisition trend</CardDescription>
                 </CardHeader>
                 <CardContent className="h-72">
                   <ResponsiveContainer width="100%" height="100%">
-                    <RechartsLineChart data={customerGrowthData}>
+                    <LineChart data={customerGrowthData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#333333" />
                       <XAxis dataKey="month" stroke="#666666" />
                       <YAxis stroke="#666666" />
@@ -313,7 +321,7 @@ const AdminDashboard = () => {
                         }}
                       />
                       <Line type="monotone" dataKey="users" stroke="#525252" name="New Users" />
-                    </RechartsLineChart>
+                    </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>

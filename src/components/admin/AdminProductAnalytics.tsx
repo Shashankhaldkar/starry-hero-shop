@@ -90,22 +90,22 @@ export const AdminProductAnalytics = () => {
       <h2 className="text-2xl font-bold text-white">Product Management & Analytics</h2>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="bg-dark-900 border border-dark-800 rounded-lg p-1 mb-6">
+        <TabsList className="bg-admin-darkGrey/40 border border-admin-grey/30 rounded-lg p-1 mb-6">
           <TabsTrigger 
             value="manage" 
-            className="data-[state=active]:bg-dark-700 data-[state=active]:text-dark-100"
+            className="data-[state=active]:bg-admin-grey text-white"
           >
             Manage Products
           </TabsTrigger>
           <TabsTrigger 
             value="list" 
-            className="data-[state=active]:bg-dark-700 data-[state=active]:text-dark-100"
+            className="data-[state=active]:bg-admin-grey text-white"
           >
             Product List
           </TabsTrigger>
           <TabsTrigger 
             value="analytics" 
-            className="data-[state=active]:bg-dark-700 data-[state=active]:text-dark-100"
+            className="data-[state=active]:bg-admin-grey text-white"
           >
             Product Analytics
           </TabsTrigger>
@@ -115,7 +115,6 @@ export const AdminProductAnalytics = () => {
           <ProductManagementForm 
             productsData={productsData?.products || []} 
             isLoading={isLoading}
-            editProduct={editProduct}
             onSuccess={handleProductAction}
           />
         </TabsContent>
