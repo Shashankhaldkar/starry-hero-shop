@@ -19,7 +19,7 @@ import {
   TrendingUp,
   LineChart
 } from "lucide-react";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Line, LineChart as RechartsLineChart } from "recharts";
 
 // Admin panel components
 import { OrderManagement } from "@/components/admin/OrderManagement";
@@ -134,6 +134,16 @@ const AdminDashboard = () => {
       </CardContent>
     </Card>
   );
+
+  // Customer growth data
+  const customerGrowthData = [
+    { month: "Jan", users: 25 },
+    { month: "Feb", users: 38 },
+    { month: "Mar", users: 52 },
+    { month: "Apr", users: 78 },
+    { month: "May", users: 103 },
+    { month: "Jun", users: 122 }
+  ];
   
   return (
     <div className="min-h-screen bg-dark-950">
@@ -291,16 +301,7 @@ const AdminDashboard = () => {
                 </CardHeader>
                 <CardContent className="h-72">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart 
-                      data={[
-                        { month: "Jan", users: 25 },
-                        { month: "Feb", users: 38 },
-                        { month: "Mar", users: 52 },
-                        { month: "Apr", users: 78 },
-                        { month: "May", users: 103 },
-                        { month: "Jun", users: 122 }
-                      ]}
-                    >
+                    <RechartsLineChart data={customerGrowthData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#333333" />
                       <XAxis dataKey="month" stroke="#666666" />
                       <YAxis stroke="#666666" />
@@ -311,8 +312,8 @@ const AdminDashboard = () => {
                           color: "#e5e5e5"
                         }}
                       />
-                      <Bar dataKey="users" fill="#525252" name="New Users" />
-                    </LineChart>
+                      <Line type="monotone" dataKey="users" stroke="#525252" name="New Users" />
+                    </RechartsLineChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>

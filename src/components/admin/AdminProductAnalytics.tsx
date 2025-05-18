@@ -113,7 +113,7 @@ export const AdminProductAnalytics = () => {
         
         <TabsContent value="manage">
           <ProductManagementForm 
-            products={productsData?.products || []} 
+            productsData={productsData?.products || []} 
             isLoading={isLoading}
             editProduct={editProduct}
             onSuccess={handleProductAction}
