@@ -34,7 +34,7 @@ export function Header() {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/products?search=${encodeURIComponent(searchQuery)}`);
+      navigate(`/shop?search=${encodeURIComponent(searchQuery)}`);
       setIsSearchOpen(false);
     }
   };
@@ -49,34 +49,34 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-gradient-starry backdrop-blur-md border-b border-starry-darkPurple/20">
+    <header className="sticky top-0 z-50 bg-gradient-starry backdrop-blur-md border-b border-gray-800/20">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo */}
+          {/* Logo - Fixed visibility */}
           <div className="flex items-center">
             <Link to={isAdmin ? "/admin" : "/"} className="flex items-center space-x-2">
-              <span className="text-2xl font-bold bg-gradient-to-r from-starry-purple to-starry-vividPurple text-transparent bg-clip-text">
-                Starry<span className="text-starry-orange">Hero</span>
+              <span className="site-name">
+                Starry<span className="site-name-accent">Hero</span>
               </span>
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          {/* Desktop Navigation - Centered */}
+          <nav className="hidden md:flex centered-nav">
             {isAdmin ? (
               <></>
             ) : (
               <>
-                <Link to="/" className="text-white hover:text-starry-purple transition-colors">
+                <Link to="/" className="text-white hover:text-gray-300 transition-colors">
                   Home
                 </Link>
-                <Link to="/shop" className="text-white hover:text-starry-purple transition-colors">
+                <Link to="/shop" className="text-white hover:text-gray-300 transition-colors">
                   Shop
                 </Link>
-                <Link to="/collections" className="text-white hover:text-starry-purple transition-colors">
+                <Link to="/collections" className="text-white hover:text-gray-300 transition-colors">
                   Collections
                 </Link>
-                <Link to="/about" className="text-white hover:text-starry-purple transition-colors">
+                <Link to="/about" className="text-white hover:text-gray-300 transition-colors">
                   About
                 </Link>
               </>
@@ -94,34 +94,34 @@ export function Header() {
                       placeholder="Search products..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-56 bg-starry-darkPurple/50 border-starry-purple/30 text-white focus:border-starry-purple"
+                      className="w-56 bg-gray-800/50 border-gray-700/30 text-white focus:border-gray-500"
                       autoFocus
                     />
                     <Button 
                       type="button" 
                       variant="ghost" 
                       size="icon" 
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-white hover:text-starry-purple"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-white hover:text-gray-300"
                       onClick={toggleSearch}
                     >
                       <X className="h-4 w-4" />
                     </Button>
                   </form>
                 ) : (
-                  <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple hover:bg-starry-darkPurple/20" onClick={toggleSearch}>
+                  <Button variant="ghost" size="icon" className="text-white hover:text-gray-300 hover:bg-gray-800/20" onClick={toggleSearch}>
                     <Search className="h-5 w-5" />
                   </Button>
                 )}
                 <Link to="/account">
-                  <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple hover:bg-starry-darkPurple/20">
+                  <Button variant="ghost" size="icon" className="text-white hover:text-gray-300 hover:bg-gray-800/20">
                     <User className="h-5 w-5" />
                   </Button>
                 </Link>
                 <Link to="/cart">
-                  <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple hover:bg-starry-darkPurple/20 relative">
+                  <Button variant="ghost" size="icon" className="text-white hover:text-gray-300 hover:bg-gray-800/20 relative">
                     <ShoppingCart className="h-5 w-5" />
                     {cartCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-starry-orange text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                      <span className="absolute -top-1 -right-1 bg-gray-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
                         {cartCount}
                       </span>
                     )}
@@ -132,7 +132,7 @@ export function Header() {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="text-white hover:text-starry-purple hover:bg-starry-darkPurple/20"
+              className="text-white hover:text-gray-300 hover:bg-gray-800/20"
               onClick={handleLogout}
             >
               <LogOut className="h-5 w-5" />
@@ -141,7 +141,7 @@ export function Header() {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
-            <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple" onClick={toggleMenu}>
+            <Button variant="ghost" size="icon" className="text-white hover:text-gray-300" onClick={toggleMenu}>
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
@@ -159,7 +159,7 @@ export function Header() {
                     placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-starry-darkPurple/50 border-starry-purple/30 text-white"
+                    className="w-full bg-gray-800/50 border-gray-700/30 text-white"
                   />
                   <Button 
                     type="submit" 
@@ -173,39 +173,39 @@ export function Header() {
               </form>
             )}
             
-            <nav className="flex flex-col space-y-4">
+            <nav className="flex flex-col items-center space-y-4">
               {isAdmin ? (
                 <></>
               ) : (
                 <>
-                  <Link to="/" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
+                  <Link to="/" className="text-white hover:text-gray-300 transition-colors px-2 py-1">
                     Home
                   </Link>
-                  <Link to="/shop" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
+                  <Link to="/shop" className="text-white hover:text-gray-300 transition-colors px-2 py-1">
                     Shop
                   </Link>
-                  <Link to="/collections" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
+                  <Link to="/collections" className="text-white hover:text-gray-300 transition-colors px-2 py-1">
                     Collections
                   </Link>
-                  <Link to="/about" className="text-white hover:text-starry-purple transition-colors px-2 py-1">
+                  <Link to="/about" className="text-white hover:text-gray-300 transition-colors px-2 py-1">
                     About
                   </Link>
                 </>
               )}
             </nav>
-            <div className="flex items-center space-x-4 pt-4 border-t border-starry-darkPurple/20">
+            <div className="flex items-center justify-center space-x-4 pt-4 border-t border-gray-800/20">
               {!isAdmin && (
                 <>
                   <Link to="/account">
-                    <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple">
+                    <Button variant="ghost" size="icon" className="text-white hover:text-gray-300">
                       <User className="h-5 w-5" />
                     </Button>
                   </Link>
                   <Link to="/cart">
-                    <Button variant="ghost" size="icon" className="text-white hover:text-starry-purple relative">
+                    <Button variant="ghost" size="icon" className="text-white hover:text-gray-300 relative">
                       <ShoppingCart className="h-5 w-5" />
                       {cartCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-starry-orange text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                        <span className="absolute -top-1 -right-1 bg-gray-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
                           {cartCount}
                         </span>
                       )}
@@ -216,7 +216,7 @@ export function Header() {
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="text-white hover:text-starry-purple"
+                className="text-white hover:text-gray-300"
                 onClick={handleLogout}
               >
                 <LogOut className="h-5 w-5" />

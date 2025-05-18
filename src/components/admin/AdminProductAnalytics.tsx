@@ -5,17 +5,28 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProductManagementForm } from "./ProductManagementForm";
 import { ProductAnalytics } from "./ProductAnalytics";
 import { ProductList } from "./ProductList";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as productAPI from "@/api/products";
 import * as adminAPI from "@/api/admin";
 import { toast } from "@/components/ui/use-toast";
 import { Product } from "@/types";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const AdminProductAnalytics = () => {
   const [activeTab, setActiveTab] = useState("manage");
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const queryClient = useQueryClient();
   
   // Fetch product data
   const { data: productsData, isLoading, error, refetch } = useQuery({
@@ -29,42 +40,36 @@ export const AdminProductAnalytics = () => {
         console.error('Error fetching products:', error);
         toast({
           title: "Failed to fetch products",
-          description: "Using sample data for demonstration",
+          description: "There was an error retrieving the product list. Please try again.",
           variant: "destructive"
         });
-        // Return some sample data as fallback
-        return { 
-          products: [
-            {
-              id: "1",
-              name: "Batman T-Shirt",
-              description: "Dark Knight t-shirt for fans",
-              price: 29.99,
-              category: "T-Shirts",
-              theme: "DC",
-              stock: 25,
-              images: ["/placeholder.svg"],
-              featured: true
-            },
-            {
-              id: "2",
-              name: "Superman Hoodie",
-              description: "Man of Steel hoodie with logo",
-              price: 49.99,
-              category: "Hoodies",
-              theme: "DC",
-              stock: 15,
-              images: ["/placeholder.svg"],
-              featured: false
-            }
-          ], 
-          pages: 1, 
-          page: 1, 
-          total: 2 
-        };
+        return { products: [], pages: 1, page: 1, total: 0 }; 
       }
     },
     retry: 1
+  });
+
+  // Delete product mutation
+  const deleteProductMutation = useMutation({
+    mutationFn: (productId: string) => adminAPI.deleteProduct(productId),
+    onSuccess: () => {
+      toast({
+        title: "Product deleted",
+        description: "The product has been successfully deleted."
+      });
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ['products-management'] });
+      setIsDeleteDialogOpen(false);
+      setProductToDelete(null);
+    },
+    onError: (error) => {
+      console.error('Error deleting product:', error);
+      toast({
+        title: "Failed to delete product",
+        description: "There was an error deleting the product. Please try again.",
+        variant: "destructive"
+      });
+    }
   });
 
   // Handle product edit
@@ -79,6 +84,13 @@ export const AdminProductAnalytics = () => {
     setIsDeleteDialogOpen(true);
   };
 
+  // Confirm product deletion
+  const confirmDeleteProduct = () => {
+    if (productToDelete) {
+      deleteProductMutation.mutate(productToDelete.id);
+    }
+  };
+
   // Handle successful product action (create/update/delete)
   const handleProductAction = () => {
     setEditProduct(null);
@@ -90,22 +102,22 @@ export const AdminProductAnalytics = () => {
       <h2 className="text-2xl font-bold text-white">Product Management & Analytics</h2>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="bg-admin-darkGrey/40 border border-admin-grey/30 rounded-lg p-1 mb-6">
+        <TabsList className="bg-gray-900/40 border border-gray-700/30 rounded-lg p-1 mb-6">
           <TabsTrigger 
             value="manage" 
-            className="data-[state=active]:bg-admin-grey text-white"
+            className="data-[state=active]:bg-gray-700 text-white"
           >
             Manage Products
           </TabsTrigger>
           <TabsTrigger 
             value="list" 
-            className="data-[state=active]:bg-admin-grey text-white"
+            className="data-[state=active]:bg-gray-700 text-white"
           >
             Product List
           </TabsTrigger>
           <TabsTrigger 
             value="analytics" 
-            className="data-[state=active]:bg-admin-grey text-white"
+            className="data-[state=active]:bg-gray-700 text-white"
           >
             Product Analytics
           </TabsTrigger>
@@ -115,6 +127,7 @@ export const AdminProductAnalytics = () => {
           <ProductManagementForm 
             productsData={productsData?.products || []} 
             isLoading={isLoading}
+            editProduct={editProduct}
             onSuccess={handleProductAction}
           />
         </TabsContent>
@@ -135,6 +148,31 @@ export const AdminProductAnalytics = () => {
           />
         </TabsContent>
       </Tabs>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent className="bg-gray-900 border-gray-700 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-400">
+              This action cannot be undone. This will permanently delete the product 
+              "{productToDelete?.name}" from the database.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-transparent text-white border-gray-700 hover:bg-gray-800">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              className="bg-red-900 hover:bg-red-800 text-white" 
+              onClick={confirmDeleteProduct}
+              disabled={deleteProductMutation.isPending}
+            >
+              {deleteProductMutation.isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

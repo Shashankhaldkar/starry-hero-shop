@@ -78,23 +78,65 @@ const getProductById = async (req, res) => {
 // @access  Private/Admin
 const createProduct = async (req, res) => {
   try {
+    const {
+      name,
+      description,
+      price,
+      discountPrice,
+      category,
+      theme,
+      sizes,
+      colors,
+      stock,
+      featured
+    } = req.body;
+
+    // Process images
+    let images = [];
+    if (req.files && req.files.images) {
+      if (Array.isArray(req.files.images)) {
+        images = req.files.images.map(file => file.path);
+      } else {
+        images = [req.files.images.path];
+      }
+    } else if (req.body.images) {
+      if (Array.isArray(req.body.images)) {
+        images = req.body.images;
+      } else {
+        images = [req.body.images];
+      }
+    }
+
+    // Process sizes and colors
+    let productSizes = [];
+    if (sizes) {
+      productSizes = Array.isArray(sizes) ? sizes : [sizes];
+    }
+
+    let productColors = [];
+    if (colors) {
+      productColors = Array.isArray(colors) ? colors : [colors];
+    }
+
     const product = new Product({
-      name: req.body.name,
-      price: req.body.price,
-      description: req.body.description,
-      images: req.body.images,
-      category: req.body.category,
-      theme: req.body.theme,
-      sizes: req.body.sizes,
-      colors: req.body.colors,
-      stock: req.body.stock,
-      inStock: req.body.stock > 0,
-      featured: req.body.featured || false,
+      name,
+      description,
+      price,
+      discountPrice: discountPrice || undefined,
+      images,
+      category,
+      theme,
+      sizes: productSizes,
+      colors: productColors,
+      stock: stock || 0,
+      inStock: stock > 0,
+      featured: featured === 'true' || featured === true,
     });
 
     const createdProduct = await product.save();
     res.status(201).json(createdProduct);
   } catch (error) {
+    console.error("Create product error:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -106,40 +148,69 @@ const updateProduct = async (req, res) => {
   try {
     const {
       name,
-      price,
       description,
-      images,
+      price,
+      discountPrice,
       category,
       theme,
       sizes,
       colors,
       stock,
-      featured,
-      discountPrice,
+      featured
     } = req.body;
 
     const product = await Product.findById(req.params.id);
 
-    if (product) {
-      product.name = name || product.name;
-      product.price = price || product.price;
-      product.description = description || product.description;
-      product.images = images || product.images;
-      product.category = category || product.category;
-      product.theme = theme || product.theme;
-      product.sizes = sizes || product.sizes;
-      product.colors = colors || product.colors;
-      product.stock = stock !== undefined ? stock : product.stock;
-      product.inStock = stock > 0;
-      product.featured = featured !== undefined ? featured : product.featured;
-      product.discountPrice = discountPrice !== undefined ? discountPrice : product.discountPrice;
-
-      const updatedProduct = await product.save();
-      res.json(updatedProduct);
-    } else {
-      res.status(404).json({ message: 'Product not found' });
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
     }
+
+    // Process images
+    let images = product.images || [];
+    if (req.files && req.files.images) {
+      // Handle file uploads
+      if (Array.isArray(req.files.images)) {
+        images = req.files.images.map(file => file.path);
+      } else {
+        images = [req.files.images.path];
+      }
+    } else if (req.body.images) {
+      // Handle image URLs in request body
+      if (Array.isArray(req.body.images)) {
+        images = req.body.images;
+      } else {
+        images = [req.body.images];
+      }
+    }
+
+    // Process sizes and colors
+    let productSizes = product.sizes || [];
+    if (sizes) {
+      productSizes = Array.isArray(sizes) ? sizes : [sizes];
+    }
+
+    let productColors = product.colors || [];
+    if (colors) {
+      productColors = Array.isArray(colors) ? colors : [colors];
+    }
+
+    product.name = name || product.name;
+    product.description = description || product.description;
+    product.price = price || product.price;
+    product.discountPrice = discountPrice !== undefined ? discountPrice : product.discountPrice;
+    product.images = images;
+    product.category = category || product.category;
+    product.theme = theme || product.theme;
+    product.sizes = productSizes;
+    product.colors = productColors;
+    product.stock = stock !== undefined ? stock : product.stock;
+    product.inStock = stock > 0;
+    product.featured = featured === 'true' || featured === true;
+
+    const updatedProduct = await product.save();
+    res.json(updatedProduct);
   } catch (error) {
+    console.error("Update product error:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -151,13 +222,14 @@ const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
 
-    if (product) {
-      await product.remove();
-      res.json({ message: 'Product removed' });
-    } else {
-      res.status(404).json({ message: 'Product not found' });
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
     }
+
+    await Product.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Product removed' });
   } catch (error) {
+    console.error("Delete product error:", error);
     res.status(500).json({ message: error.message });
   }
 };
