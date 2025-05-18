@@ -1,10 +1,10 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useQuery } from "@tanstack/react-query";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
 import * as adminAPI from "@/api/admin";
 import { toast } from "@/components/ui/use-toast";
 import { Product } from "@/types";
@@ -28,14 +28,24 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
         console.error('Error fetching product analytics:', error);
         toast({
           title: "Failed to fetch analytics",
-          description: "There was an error loading analytics data",
+          description: "Using sample data for demonstration",
           variant: "destructive"
         });
+        // Return sample data as fallback
         return {
-          salesData: [],
-          totalSales: 0,
-          totalRevenue: 0,
-          averageRating: 0
+          salesData: [
+            { period: 'Jan', sales: 45, revenue: 1350, views: 120 },
+            { period: 'Feb', sales: 52, revenue: 1560, views: 145 },
+            { period: 'Mar', sales: 61, revenue: 1830, views: 190 },
+            { period: 'Apr', sales: 67, revenue: 2010, views: 220 },
+            { period: 'May', sales: 70, revenue: 2100, views: 240 },
+            { period: 'Jun', sales: 74, revenue: 2220, views: 260 }
+          ],
+          totalSales: 369,
+          totalRevenue: 11070,
+          totalViews: 1175,
+          averageRating: 4.5,
+          conversionRate: 7.8
         };
       }
     },
@@ -63,7 +73,8 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
     return analyticsData.salesData.map((item: any) => ({
       name: item.period,
       sales: item.sales,
-      revenue: item.revenue
+      revenue: item.revenue,
+      views: item.views
     }));
   };
 
@@ -72,10 +83,10 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
   // Show loading state
   if (isLoading || analyticsLoading) {
     return (
-      <Card className="bg-starry-darkPurple/40 border-starry-purple/30 backdrop-blur-sm">
+      <Card className="bg-dark-900 border-dark-700">
         <CardContent className="p-6">
           <div className="flex items-center justify-center h-64">
-            <p className="text-white">Loading analytics data...</p>
+            <p className="text-dark-400">Loading analytics data...</p>
           </div>
         </CardContent>
       </Card>
@@ -84,14 +95,14 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
 
   return (
     <div className="space-y-6">
-      <Card className="bg-starry-darkPurple/40 border-starry-purple/30 backdrop-blur-sm">
+      <Card className="bg-dark-900 border-dark-700">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <Label htmlFor="product-select">Select Product</Label>
+              <Label htmlFor="product-select" className="text-dark-200">Select Product</Label>
               <select
                 id="product-select"
-                className="w-full p-2 mt-1 bg-starry-darkPurple/20 border border-starry-purple/30 rounded-md text-white"
+                className="w-full p-2 mt-1 bg-dark-800 border border-dark-700 rounded-md text-white"
                 value={productId}
                 onChange={handleProductChange}
               >
@@ -105,7 +116,7 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
             </div>
             
             <div>
-              <Label>Time Range</Label>
+              <Label className="text-dark-200">Time Range</Label>
               <RadioGroup 
                 value={timeRange} 
                 onValueChange={handleTimeRangeChange} 
@@ -113,28 +124,28 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="30days" id="r1" />
-                  <Label htmlFor="r1">30 Days</Label>
+                  <Label htmlFor="r1" className="text-dark-200">30 Days</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="3months" id="r2" />
-                  <Label htmlFor="r2">3 Months</Label>
+                  <Label htmlFor="r2" className="text-dark-200">3 Months</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="6months" id="r3" />
-                  <Label htmlFor="r3">6 Months</Label>
+                  <Label htmlFor="r3" className="text-dark-200">6 Months</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="1year" id="r4" />
-                  <Label htmlFor="r4">1 Year</Label>
+                  <Label htmlFor="r4" className="text-dark-200">1 Year</Label>
                 </div>
               </RadioGroup>
             </div>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            <Card className="bg-starry-darkPurple/60 border-starry-purple/20">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+            <Card className="bg-dark-800 border-dark-700">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-400">Total Sales</CardTitle>
+                <CardTitle className="text-sm font-medium text-dark-400">Total Sales</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -143,9 +154,9 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
               </CardContent>
             </Card>
             
-            <Card className="bg-starry-darkPurple/60 border-starry-purple/20">
+            <Card className="bg-dark-800 border-dark-700">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-400">Total Revenue</CardTitle>
+                <CardTitle className="text-sm font-medium text-dark-400">Total Revenue</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -154,9 +165,9 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
               </CardContent>
             </Card>
             
-            <Card className="bg-starry-darkPurple/60 border-starry-purple/20">
+            <Card className="bg-dark-800 border-dark-700">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-400">Avg. Rating</CardTitle>
+                <CardTitle className="text-sm font-medium text-dark-400">Avg. Rating</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -166,38 +177,87 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
             </Card>
           </div>
           
-          <div className="h-80 mt-4">
-            {chartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={chartData}
-                  margin={{
-                    top: 20,
-                    right: 30,
-                    left: 20,
-                    bottom: 5,
-                  }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-                  <XAxis dataKey="name" stroke="#8E9196" />
-                  <YAxis stroke="#8E9196" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: "#1A1F2C", 
-                      borderColor: "#9b87f5",
-                      borderRadius: "4px",
-                      color: "#fff"
-                    }} 
-                  />
-                  <Bar dataKey="sales" name="Sales" fill="#9b87f5" />
-                  <Bar dataKey="revenue" name="Revenue (₹)" fill="#6E59A5" />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <p className="text-gray-400">No data available for the selected period</p>
-              </div>
-            )}
+          {/* Sales Chart */}
+          <div className="mb-8">
+            <h3 className="text-lg font-medium mb-4">Sales Performance</h3>
+            <div className="h-80">
+              {chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={chartData}
+                    margin={{
+                      top: 20,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+                    <XAxis dataKey="name" stroke="#737373" />
+                    <YAxis stroke="#737373" />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: "#171717", 
+                        borderColor: "#404040",
+                        borderRadius: "4px",
+                        color: "#d4d4d4"
+                      }} 
+                    />
+                    <Bar dataKey="sales" name="Sales" fill="#525252" />
+                    <Bar dataKey="revenue" name="Revenue (₹)" fill="#737373" />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-dark-400">No data available for the selected period</p>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {/* Product Views Chart */}
+          <div>
+            <h3 className="text-lg font-medium mb-4">Product Views</h3>
+            <div className="h-80">
+              {chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={chartData}
+                    margin={{
+                      top: 20,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+                    <XAxis dataKey="name" stroke="#737373" />
+                    <YAxis stroke="#737373" />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: "#171717", 
+                        borderColor: "#404040",
+                        borderRadius: "4px",
+                        color: "#d4d4d4"
+                      }} 
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="views" 
+                      stroke="#a3a3a3" 
+                      strokeWidth={2}
+                      dot={{ r: 4 }}
+                      activeDot={{ r: 6 }}
+                      name="Product Views" 
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-dark-400">No data available for the selected period</p>
+                </div>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>

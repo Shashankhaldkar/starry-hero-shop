@@ -5,84 +5,84 @@
 
 @layer base {
   :root {
-    /* Starry Night & Comic Superheroes Theme */
-    --background: 240 20% 13%; /* Dark blue background */
+    /* Black and Grey Theme */
+    --background: 0 0% 7%; /* Dark black background */
     --foreground: 0 0% 100%; /* White text */
 
-    --card: 240 18% 18%; /* Slightly lighter bg for cards */
+    --card: 0 0% 10%; /* Slightly lighter bg for cards */
     --card-foreground: 0 0% 100%; /* White text on cards */
 
-    --popover: 240 20% 13%;
+    --popover: 0 0% 7%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 260 85% 74%; /* Purplish blue from starry theme */
+    --primary: 0 0% 60%; /* Light grey for primary */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 239 16% 20%; /* Darker purple */
-    --secondary-foreground: 0 0% 95%;
+    --secondary: 0 0% 15%; /* Darker grey */
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 240 10% 20%;
-    --muted-foreground: 240 5% 75%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 70%;
 
-    --accent: 26 90% 53%; /* Orange for accents */
+    --accent: 0 0% 30%; /* Medium grey for accents */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 10% 25%;
-    --input: 240 10% 25%;
-    --ring: 260 85% 74%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 0 0% 50%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 240 20% 10%;
-    --sidebar-foreground: 240 5% 95%;
-    --sidebar-primary: 260 85% 74%;
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 0 0% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 10% 15%;
-    --sidebar-accent-foreground: 240 5% 95%;
-    --sidebar-border: 240 10% 15%;
-    --sidebar-ring: 260 85% 74%;
+    --sidebar-accent: 0 0% 11%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 0 0% 50%;
   }
 
   .light {
-    --background: 240 30% 98%; /* Light bluish background */
-    --foreground: 240 20% 10%; /* Dark text */
+    --background: 0 0% 98%; /* Light background */
+    --foreground: 0 0% 10%; /* Dark text */
 
     --card: 0 0% 100%; /* White cards */
-    --card-foreground: 240 20% 10%; /* Dark text on cards */
+    --card-foreground: 0 0% 10%; /* Dark text on cards */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 20% 10%;
+    --popover-foreground: 0 0% 10%;
 
-    --primary: 260 85% 74%; /* Keep same purple */
+    --primary: 0 0% 40%; /* Grey */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 10% 90%; /* Light purple */
-    --secondary-foreground: 240 20% 10%;
+    --secondary: 0 0% 90%; /* Light grey */
+    --secondary-foreground: 0 0% 10%;
 
-    --muted: 240 10% 95%;
-    --muted-foreground: 240 5% 40%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 26 90% 53%; /* Same orange */
+    --accent: 0 0% 30%; /* Same grey */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 10% 85%;
-    --input: 240 10% 85%;
-    --ring: 260 85% 74%;
+    --border: 0 0% 85%;
+    --input: 0 0% 85%;
+    --ring: 0 0% 40%;
 
-    --sidebar-background: 240 30% 98%;
-    --sidebar-foreground: 240 20% 10%;
-    --sidebar-primary: 260 85% 74%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 10%;
+    --sidebar-primary: 0 0% 40%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 10% 95%;
-    --sidebar-accent-foreground: 240 20% 10%;
-    --sidebar-border: 240 10% 85%;
-    --sidebar-ring: 260 85% 74%;
+    --sidebar-accent: 0 0% 95%;
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 0 0% 85%;
+    --sidebar-ring: 0 0% 40%;
   }
 }
 
@@ -97,31 +97,31 @@
   
   /* Custom scrollbar */
   ::-webkit-scrollbar {
-    width: 10px;
+    width: 8px;
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-starry-darkPurple;
+    @apply bg-dark-800;
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-starry-purple/30 rounded-full hover:bg-starry-purple/50 transition-colors;
+    @apply bg-dark-600 rounded-full hover:bg-dark-500 transition-colors;
   }
 }
 
-/* Create starry background animation */
+/* Custom utility classes */
 @layer components {
-  .starry-text-gradient {
-    @apply bg-gradient-to-r from-starry-purple to-starry-vividPurple text-transparent bg-clip-text;
+  .text-gradient {
+    @apply bg-gradient-to-r from-dark-100 to-dark-300 text-transparent bg-clip-text;
   }
   
-  /* Custom animation for button hover */
-  .btn-hero-hover {
+  /* Custom button hover effect */
+  .btn-hover-effect {
     position: relative;
     overflow: hidden;
   }
   
-  .btn-hero-hover:after {
+  .btn-hover-effect:after {
     content: '';
     position: absolute;
     top: 0;
@@ -131,13 +131,22 @@
     background: linear-gradient(
       90deg, 
       transparent, 
-      rgba(255, 255, 255, 0.2), 
+      rgba(255, 255, 255, 0.1), 
       transparent
     );
     transition: 0.5s;
   }
   
-  .btn-hero-hover:hover:after {
+  .btn-hover-effect:hover:after {
     left: 100%;
+  }
+  
+  /* Card styles */
+  .card-dark {
+    @apply bg-dark-900/80 border border-dark-700/50 backdrop-blur-sm text-dark-100;
+  }
+  
+  .input-dark {
+    @apply bg-dark-800/80 border-dark-700 text-dark-100 placeholder:text-dark-400;
   }
 }

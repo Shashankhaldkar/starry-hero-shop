@@ -63,17 +63,18 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Starry Night & Comic Superheroes Theme
-				starry: {
-					purple: '#9b87f5',
-					darkPurple: '#1A1F2C',
-					vividPurple: '#8B5CF6',
-					orange: '#F97316',
-					blue: '#0EA5E9',
-					white: '#FFFFFF',
-					softPurple: '#E5DEFF',
-					neutral: '#8E9196',
-					charcoal: '#221F26',
+				// New black and grey theme
+				dark: {
+					100: '#f5f5f5',
+					200: '#e5e5e5',
+					300: '#d4d4d4',
+					400: '#a3a3a3',
+					500: '#737373',
+					600: '#525252',
+					700: '#404040',
+					800: '#262626',
+					900: '#171717',
+					950: '#0a0a0a',
 				}
 			},
 			borderRadius: {
@@ -109,7 +110,7 @@ export default {
 				'spin-slow': {
 					'to': { transform: 'rotate(360deg)' }
 				},
-				'starry-bg': {
+				'bg-shift': {
 					'0%': { backgroundPosition: '0% 0%' },
 					'100%': { backgroundPosition: '100% 100%' }
 				}
@@ -120,11 +121,11 @@ export default {
 				'float': 'float 6s ease-in-out infinite',
 				'pulse-gentle': 'pulse-gentle 4s ease-in-out infinite',
 				'spin-slow': 'spin-slow 20s linear infinite',
-				'starry-bg': 'starry-bg 30s ease infinite alternate'
+				'bg-shift': 'bg-shift 30s ease infinite alternate'
 			},
 			backgroundImage: {
-				'starry-pattern': "url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNi41NzEgNS4yODZsLTUgMi44NTd2NS43MTRsNSAyLjg1NyA1LTIuODU3di01LjcxNHoiIHN0cm9rZT0icmdiYSgxMzksMTM1LDI0NSwwLjIpIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNNTEuNDI5IDI3Ljg1N2wtNSAyLjg1N3Y1LjcxNGw1IDIuODU3IDUtMi44NTd2LTUuNzE0eiIgc3Ryb2tlPSJyZ2JhKDEzOSwxMzUsMjQ1LDAuMikiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik0xNSAyNy44NTdsLTUgMi44NTd2NS43MTRsNSAyLjg1NyA1LTIuODU3di01LjcxNHoiIHN0cm9rZT0icmdiYSgxMzksMTM1LDI0NSwwLjIpIiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGZpbGw9InJnYmEoMTM5LDEzNSwyNDUsMC4xKSIgY3g9IjQ2IiBjeT0iMTYiIHI9IjQiLz48Y2lyY2xlIGZpbGw9InJnYmEoMTM5LDEzNSwyNDUsMC4xKSIgY3g9IjIwIiBjeT0iNDgiIHI9IjQiLz48Y2lyY2xlIGZpbGw9InJnYmEoMTM5LDEzNSwyNDUsMC4xKSIgY3g9IjQ4IiBjeT0iNDYiIHI9IjIiLz48Y2lyY2xlIGZpbGw9InJnYmEoMTM5LDEzNSwyNDUsMC4xKSIgY3g9IjEyIiBjeT0iMTQiIHI9IjIiLz48Y2lyY2xlIGZpbGw9InJnYmEoMTM5LDEzNSwyNDUsMC4xKSIgY3g9IjMzIiBjeT0iMzgiIHI9IjMiLz48L2c+PC9zdmc+Cg==')",
-				'gradient-starry': 'linear-gradient(135deg, rgba(26, 31, 44, 0.95) 0%, rgba(34, 31, 38, 0.95) 100%)'
+				'dark-pattern': "url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiIGlkPSJhIj48c3RvcCBzdG9wLWNvbG9yPSIjMjIyIiBzdG9wLW9wYWNpdHk9Ii4wNSIgb2Zmc2V0PSIwJSIvPjxzdG9wIHN0b3AtY29sb3I9IiMyMjIiIHN0b3Atb3BhY2l0eT0iLjA1IiBvZmZzZXQ9IjEwMCUiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cGF0aCBmaWxsPSJ1cmwoI2EpIiBkPSJNMCAwaDYwdjYwSDB6Ii8+PHBhdGggZD0iTTM2LjU3MSA1LjI4NmwtNSAyLjg1N3Y1LjcxNGw1IDIuODU3IDUtMi44NTd2LTUuNzE0eiIgc3Ryb2tlPSJyZ2JhKDEzNiwxMzYsMTM2LDAuMSkiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjxwYXRoIGQ9Ik01MS40MjkgMjcuODU3bC01IDIuODU3djUuNzE0bDUgMi44NTcgNS0yLjg1N3YtNS43MTR6IiBzdHJva2U9InJnYmEoMTM2LDEzNiwxMzYsMC4xKSIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIi8+PHBhdGggZD0iTTE1IDI3Ljg1N2wtNSAyLjg1N3Y1LjcxNGw1IDIuODU3IDUtMi44NTd2LTUuNzE0eiIgc3Ryb2tlPSJyZ2JhKDEzNiwxMzYsMTM2LDAuMSkiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjxjaXJjbGUgZmlsbD0icmdiYSgxMzYsMTM2LDEzNiwwLjEpIiBjeD0iNDYiIGN5PSIxNiIgcj0iNCIvPjxjaXJjbGUgZmlsbD0icmdiYSgxMzYsMTM2LDEzNiwwLjEpIiBjeD0iMjAiIGN5PSI0OCIgcj0iNCIvPjxjaXJjbGUgZmlsbD0icmdiYSgxMzYsMTM2LDEzNiwwLjEpIiBjeD0iNDgiIGN5PSI0NiIgcj0iMiIvPjxjaXJjbGUgZmlsbD0icmdiYSgxMzYsMTM2LDEzNiwwLjEpIiBjeD0iMTIiIGN5PSIxNCIgcj0iMiIvPjxjaXJjbGUgZmlsbD0icmdiYSgxMzYsMTM2LDEzNiwwLjEpIiBjeD0iMzMiIGN5PSIzOCIgcj0iMyIvPjwvc3ZnPg==')",
+				'gradient-dark': 'linear-gradient(135deg, rgba(13, 13, 13, 0.95) 0%, rgba(26, 26, 26, 0.95) 100%)'
 			}
 		}
 	},
