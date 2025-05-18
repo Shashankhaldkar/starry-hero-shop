@@ -21,4 +21,13 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Response interceptor to handle common errors
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('API Error:', error.response?.data || error.message);
+    return Promise.reject(error);
+  }
+);
+
 export default API;

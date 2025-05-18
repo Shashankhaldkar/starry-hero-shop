@@ -42,13 +42,16 @@ const registerUser = async (req, res) => {
     });
 
     if (user) {
+      // Generate token
+      const token = generateToken(user._id);
+      
       res.status(201).json({
         _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
         avatar: user.avatar,
-        token: generateToken(user._id),
+        token,
       });
     } else {
       res.status(400).json({ message: 'Invalid user data' });
@@ -89,7 +92,7 @@ const loginUser = async (req, res) => {
 
     const token = generateToken(user._id);
 
-    res.json({
+    res.status(200).json({
       _id: user._id,
       name: user.name,
       email: user.email,

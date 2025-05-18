@@ -21,19 +21,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Check for user in localStorage on initial load
+    const storedUser = localStorage.getItem("user");
     const token = localStorage.getItem("token");
-    if (token) {
-      authAPI.getUserProfile()
-        .then((profile) => {
-          setUser(profile);
-        })
-        .catch((error) => {
-          console.error("Error fetching user profile:", error);
-          setUser(null);
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-        })
-        .finally(() => setLoading(false));
+    
+    if (storedUser && token) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error("Error parsing stored user:", error);
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+      }
+      setLoading(false);
     } else {
       setLoading(false);
     }
@@ -54,7 +55,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         description: `Welcome back, ${data.name}!`
       });
       return data;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error in context:", error);
       toast({
         title: "Login failed",
@@ -65,7 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const registerUserFn = async (name: string, email: string, password: string, isAdmin: boolean = false) => {
+  const registerUser = async (name: string, email: string, password: string, isAdmin: boolean = false) => {
     if (!name || !email || !password) {
       throw new Error("All fields are required");
     }
@@ -84,7 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         description: `Welcome, ${data.name}!`
       });
       return data;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Registration error in context:", error);
       toast({
         title: "Registration failed",
@@ -99,8 +100,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       authAPI.logout();
       setUser(null);
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
       toast({
         title: "Logout successful",
         description: "You've been logged out successfully"
@@ -121,7 +120,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isAuthenticated: !!user,
       loading,
       loginUser,
-      registerUser: registerUserFn,
+      registerUser,
       logout: logoutFn,
       setUser
     }}>

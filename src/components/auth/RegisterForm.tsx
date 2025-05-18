@@ -53,10 +53,6 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
     }
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/users/auth/google`;
-  };
-
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3 mt-4" autoComplete="on">
       <Input
@@ -120,16 +116,6 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
         <span className="px-2 text-xs text-muted-foreground select-none">or</span>
         <div className="flex-1 h-px bg-starry-purple/40" />
       </div>
-
-      <Button
-        variant="outline"
-        className="w-full flex items-center justify-center gap-2 btn-hero-hover"
-        type="button"
-        onClick={handleGoogleLogin}
-        disabled={loading}
-      >
-        <Mail className="w-4 h-4" /> Continue with Google
-      </Button>
 
       <p className="text-xs text-center mt-4">
         Already have an account?{" "}
