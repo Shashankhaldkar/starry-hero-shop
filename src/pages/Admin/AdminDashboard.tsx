@@ -22,12 +22,13 @@ const AdminDashboard = () => {
   const location = useLocation();
   
   // Fetch dashboard stats
-  const { data: dashboardStats, isLoading: statsLoading } = useQuery({
+  const { data: dashboardStats, isLoading: statsLoading, error } = useQuery({
     queryKey: ['admin-dashboard-stats'],
     queryFn: async () => {
       try {
         return await adminAPI.getDashboardStats();
       } catch (error) {
+        console.error("Error fetching dashboard stats:", error);
         toast({
           title: "Failed to fetch dashboard stats",
           description: "There was an error loading dashboard data",
@@ -41,7 +42,8 @@ const AdminDashboard = () => {
           popularProducts: []
         };
       }
-    }
+    },
+    retry: 1,
   });
   
   // Set active tab based on current route
@@ -146,16 +148,18 @@ const AdminDashboard = () => {
                 <CardHeader>
                   <CardTitle>Recent Orders</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="overflow-auto max-h-[220px]">
                   {statsLoading ? (
                     <p>Loading recent order data...</p>
+                  ) : error ? (
+                    <p>Error loading recent orders. Please refresh.</p>
                   ) : recentOrders.length > 0 ? (
                     <div className="space-y-4">
                       {recentOrders.map((order) => (
                         <div key={order._id} className="flex justify-between">
                           <div>
                             <div className="font-medium">Order #{order._id.slice(-6)}</div>
-                            <div className="text-sm text-gray-400">{order.user.name}</div>
+                            <div className="text-sm text-gray-400">{order.user?.name || 'Unknown'}</div>
                           </div>
                           <div className="text-right">
                             <div>₹{order.totalPrice}</div>
@@ -174,9 +178,11 @@ const AdminDashboard = () => {
                 <CardHeader>
                   <CardTitle>Popular Products</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="overflow-auto max-h-[220px]">
                   {statsLoading ? (
                     <p>Loading popular products...</p>
+                  ) : error ? (
+                    <p>Error loading popular products. Please refresh.</p>
                   ) : popularProducts.length > 0 ? (
                     <div className="space-y-4">
                       {popularProducts.map((product) => (
@@ -184,7 +190,7 @@ const AdminDashboard = () => {
                           <div className="font-medium truncate" style={{ maxWidth: "200px" }}>{product.name}</div>
                           <div className="text-right">
                             <div>₹{product.price}</div>
-                            <div className="text-sm text-gray-400">{product.soldCount} sold</div>
+                            <div className="text-sm text-gray-400">{product.soldCount || 0} sold</div>
                           </div>
                         </div>
                       ))}

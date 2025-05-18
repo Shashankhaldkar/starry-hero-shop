@@ -49,7 +49,7 @@ export const updateOrderStatus = async (orderId: string, status: string) => {
 // Create a new product
 export const createProduct = async (productData: FormData) => {
   try {
-    const { data } = await API.post('/admin/products', productData, {
+    const { data } = await API.post('/products', productData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -64,7 +64,7 @@ export const createProduct = async (productData: FormData) => {
 // Update a product
 export const updateProduct = async (productId: string, productData: FormData) => {
   try {
-    const { data } = await API.put(`/admin/products/${productId}`, productData, {
+    const { data } = await API.put(`/products/${productId}`, productData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -79,7 +79,7 @@ export const updateProduct = async (productId: string, productData: FormData) =>
 // Delete a product
 export const deleteProduct = async (productId: string) => {
   try {
-    const { data } = await API.delete(`/admin/products/${productId}`);
+    const { data } = await API.delete(`/products/${productId}`);
     return data;
   } catch (error) {
     console.error('Error deleting product:', error);
@@ -96,19 +96,6 @@ export const getProductAnalytics = async (productId: string = 'all', timeRange: 
     return data;
   } catch (error) {
     console.error('Error fetching product analytics:', error);
-    // Return mock data temporarily while backend is being fixed
-    return {
-      salesData: [
-        { period: "Jan", sales: 12, revenue: 12000 },
-        { period: "Feb", sales: 19, revenue: 19000 },
-        { period: "Mar", sales: 15, revenue: 15000 },
-        { period: "Apr", sales: 22, revenue: 22000 },
-        { period: "May", sales: 28, revenue: 28000 },
-        { period: "Jun", sales: 16, revenue: 16000 },
-      ],
-      totalSales: 112,
-      totalRevenue: 112000,
-      averageRating: 4.5
-    };
+    throw error;
   }
 };

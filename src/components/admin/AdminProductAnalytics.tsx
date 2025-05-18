@@ -6,14 +6,13 @@ import { ProductManagementForm } from "./ProductManagementForm";
 import { ProductAnalytics } from "./ProductAnalytics";
 import { useQuery } from "@tanstack/react-query";
 import * as productAPI from "@/api/products";
-import * as adminAPI from "@/api/admin";
 import { toast } from "@/components/ui/use-toast";
 
 export const AdminProductAnalytics = () => {
   const [activeTab, setActiveTab] = useState("manage");
   
   // Fetch product data
-  const { data: productsData, isLoading: productsLoading } = useQuery({
+  const { data: productsData, isLoading: productsLoading, error } = useQuery({
     queryKey: ['products-analytics'],
     queryFn: async () => {
       try {
@@ -29,7 +28,8 @@ export const AdminProductAnalytics = () => {
         });
         return { products: [], pages: 0, page: 1, total: 0 };
       }
-    }
+    },
+    retry: 1
   });
 
   return (
@@ -47,11 +47,17 @@ export const AdminProductAnalytics = () => {
         </TabsList>
         
         <TabsContent value="manage">
-          <ProductManagementForm productsData={productsData?.products} isLoading={productsLoading} />
+          <ProductManagementForm 
+            productsData={productsData?.products || []} 
+            isLoading={productsLoading} 
+          />
         </TabsContent>
         
         <TabsContent value="analytics">
-          <ProductAnalytics productsData={productsData?.products} isLoading={productsLoading} />
+          <ProductAnalytics 
+            productsData={productsData?.products || []} 
+            isLoading={productsLoading} 
+          />
         </TabsContent>
       </Tabs>
     </div>
