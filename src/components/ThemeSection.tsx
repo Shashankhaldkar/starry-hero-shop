@@ -1,39 +1,61 @@
+import { useState, useEffect } from "react";
+import { getProductThemes } from "@/api/productsData";
+import { Link } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
 
-import { themes } from "@/data/products";
+interface Theme {
+  id: string;
+  name: string;
+  image: string;
+}
 
 export function ThemeSection() {
+  const [themes, setThemes] = useState<Theme[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchThemes = async () => {
+      setIsLoading(true);
+      const fetchedThemes = await getProductThemes();
+      setThemes(
+        fetchedThemes.map((theme, index) => ({
+          id: theme.toLowerCase().replace(/\s+/g, "-"),
+          name: theme,
+          image: `https://source.unsplash.com/600x400/?${theme}&${index}`,
+        }))
+      );
+      setIsLoading(false);
+    };
+
+    fetchThemes();
+  }, []);
+
   return (
-    <section className="py-16 bg-gradient-to-b from-starry-darkPurple to-starry-charcoal">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-2 text-white">Explore Themes</h2>
-        <p className="text-starry-neutral text-center mb-10">Discover t-shirts inspired by your favorite universes</p>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <section className="container mx-auto py-12">
+      <h2 className="text-3xl font-bold text-center mb-8">Shop By Theme</h2>
+      {isLoading ? (
+        <div className="text-center">Loading themes...</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {themes.map((theme) => (
-            <a 
-              key={theme.id} 
-              href={`/theme/${theme.id}`}
-              className="group relative overflow-hidden rounded-xl h-60 flex items-end transition-transform hover:-translate-y-2 duration-300"
-            >
-              {/* Theme image with gradient overlay */}
-              <div className="absolute inset-0">
-                <div className="absolute inset-0 bg-gradient-to-t from-starry-darkPurple via-starry-darkPurple/70 to-transparent z-10"></div>
-                <img 
-                  src={theme.image} 
-                  alt={theme.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-              </div>
-              
-              {/* Theme name */}
-              <div className="relative z-20 w-full p-6">
-                <h3 className="text-xl font-bold text-white mb-1">{theme.name}</h3>
-                <div className="w-10 h-1 bg-starry-purple rounded-full transform origin-left transition-all duration-300 group-hover:w-20 group-hover:bg-starry-orange"></div>
-              </div>
-            </a>
+            <Card key={theme.id} className="bg-gray-900/50 border-gray-700 group cursor-pointer hover:border-gray-500 transition-all overflow-hidden">
+              <Link to={`/shop?theme=${encodeURIComponent(theme.name)}`}>
+                <div className="relative overflow-hidden">
+                  <img
+                    src={theme.image}
+                    alt={theme.name}
+                    className="w-full h-64 object-cover brightness-75 group-hover:brightness-100 transition-all group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/10 transition-all">
+                    <h3 className="text-white text-xl font-bold text-center px-4">{theme.name}</h3>
+                  </div>
+                </div>
+              </Link>
+            </Card>
           ))}
         </div>
-      </div>
+      )}
     </section>
   );
 }
+

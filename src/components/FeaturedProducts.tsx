@@ -1,12 +1,20 @@
-
-import { products } from "@/data/products";
+import { useState, useEffect } from "react";
+import { getFeaturedProducts } from "@/api/productsData";
+import { Card } from "@/components/ui/card";
+import { Product } from "@/types";
 import { cn } from "@/lib/utils";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function FeaturedProducts() {
   // Filter only featured products
-  const featuredProducts = products.filter(product => product.featured);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    getFeaturedProducts().then((data) => {
+      setFeaturedProducts(data);
+    });
+  }, []);
 
   return (
     <section className="py-16 bg-starry-charcoal">
