@@ -1,33 +1,20 @@
+
 import { useState, useEffect } from "react";
-import { getProductThemes } from "@/api/productsData";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-
-interface Theme {
-  id: string;
-  name: string;
-  image: string;
-}
+import { themes } from "@/data/products";
+import { Theme } from "@/types";
 
 export function ThemeSection() {
-  const [themes, setThemes] = useState<Theme[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Simulating loading state for consistency with the API approach
   useEffect(() => {
-    const fetchThemes = async () => {
-      setIsLoading(true);
-      const fetchedThemes = await getProductThemes();
-      setThemes(
-        fetchedThemes.map((theme, index) => ({
-          id: theme.toLowerCase().replace(/\s+/g, "-"),
-          name: theme,
-          image: `https://source.unsplash.com/600x400/?${theme}&${index}`,
-        }))
-      );
+    const timer = setTimeout(() => {
       setIsLoading(false);
-    };
-
-    fetchThemes();
+    }, 500);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -58,4 +45,3 @@ export function ThemeSection() {
     </section>
   );
 }
-

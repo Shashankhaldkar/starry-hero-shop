@@ -2,20 +2,30 @@
 import { Product, Category, Theme } from "@/types";
 import * as productAPI from "@/api/products";
 
-// Helper function to get product categories from API
+// Helper function to transform API response categories into our Category type
 export const getProductCategories = async (): Promise<Category[]> => {
   try {
-    return await productAPI.getProductCategories();
+    const categoryNames = await productAPI.getProductCategories();
+    return categoryNames.map((name, index) => ({
+      id: name.toLowerCase().replace(/\s+/g, "-"),
+      name: name,
+      image: `https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=3064&auto=format&fit=crop&ixid=${index}`
+    }));
   } catch (error) {
     console.error("Error fetching product categories:", error);
     return [];
   }
 };
 
-// Helper function to get product themes from API
+// Helper function to transform API response themes into our Theme type
 export const getProductThemes = async (): Promise<Theme[]> => {
   try {
-    return await productAPI.getProductThemes();
+    const themeNames = await productAPI.getProductThemes();
+    return themeNames.map((name, index) => ({
+      id: name.toLowerCase().replace(/\s+/g, "-"),
+      name: name,
+      image: `https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=3074&auto=format&fit=crop&ixid=${index}`
+    }));
   } catch (error) {
     console.error("Error fetching product themes:", error);
     return [];
@@ -25,7 +35,11 @@ export const getProductThemes = async (): Promise<Theme[]> => {
 // Helper function to get all products
 export const getAllProducts = async (): Promise<Product[]> => {
   try {
-    return await productAPI.getAllProducts();
+    const response = await productAPI.getProducts();
+    return response.products.map(product => ({
+      ...product,
+      id: product._id // Map _id to id for consistency with our types
+    }));
   } catch (error) {
     console.error("Error fetching all products:", error);
     return [];
@@ -35,8 +49,14 @@ export const getAllProducts = async (): Promise<Product[]> => {
 // Helper function to get featured products
 export const getFeaturedProducts = async (): Promise<Product[]> => {
   try {
-    const allProducts = await productAPI.getAllProducts();
-    return allProducts.filter(product => product.featured).slice(0, 8);
+    const response = await productAPI.getProducts("", 1, "", "", 0, 0);
+    return response.products
+      .filter(product => product.featured)
+      .slice(0, 8)
+      .map(product => ({
+        ...product,
+        id: product._id
+      }));
   } catch (error) {
     console.error("Error fetching featured products:", error);
     return [];
@@ -44,21 +64,29 @@ export const getFeaturedProducts = async (): Promise<Product[]> => {
 };
 
 // Helper function to get products by category
-export const getProductsByCategory = async (category: string): Promise<Product[]> => {
+export const getProductsByCategory = async (categoryId: string): Promise<Product[]> => {
   try {
-    return await productAPI.getProductsByCategory(category);
+    const response = await productAPI.getProducts("", 1, categoryId);
+    return response.products.map(product => ({
+      ...product,
+      id: product._id
+    }));
   } catch (error) {
-    console.error(`Error fetching products for category ${category}:`, error);
+    console.error(`Error fetching products for category ${categoryId}:`, error);
     return [];
   }
 };
 
 // Helper function to get products by theme
-export const getProductsByTheme = async (theme: string): Promise<Product[]> => {
+export const getProductsByTheme = async (themeId: string): Promise<Product[]> => {
   try {
-    return await productAPI.getProductsByTheme(theme);
+    const response = await productAPI.getProducts("", 1, "", themeId);
+    return response.products.map(product => ({
+      ...product,
+      id: product._id
+    }));
   } catch (error) {
-    console.error(`Error fetching products for theme ${theme}:`, error);
+    console.error(`Error fetching products for theme ${themeId}:`, error);
     return [];
   }
 };
@@ -66,10 +94,14 @@ export const getProductsByTheme = async (theme: string): Promise<Product[]> => {
 // Helper function to get new arrivals (most recently added products)
 export const getNewArrivals = async (): Promise<Product[]> => {
   try {
-    const allProducts = await productAPI.getAllProducts();
-    return [...allProducts]
+    const response = await productAPI.getProducts();
+    return response.products
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 8);
+      .slice(0, 8)
+      .map(product => ({
+        ...product,
+        id: product._id
+      }));
   } catch (error) {
     console.error("Error fetching new arrivals:", error);
     return [];
@@ -79,10 +111,14 @@ export const getNewArrivals = async (): Promise<Product[]> => {
 // Helper function to get popular products (highest rated or most sold)
 export const getPopularProducts = async (): Promise<Product[]> => {
   try {
-    const allProducts = await productAPI.getAllProducts();
-    return [...allProducts]
+    const response = await productAPI.getProducts();
+    return response.products
       .sort((a, b) => (b.rating || 0) - (a.rating || 0))
-      .slice(0, 8);
+      .slice(0, 8)
+      .map(product => ({
+        ...product,
+        id: product._id
+      }));
   } catch (error) {
     console.error("Error fetching popular products:", error);
     return [];

@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { getProductCategories } from "@/api/productsData";
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";

@@ -99,12 +99,12 @@
   [class*="bg-admin"] input,
   [class*="bg-admin"] textarea,
   [class*="bg-admin"] select {
-    @apply text-white;
+    color: #ffffff;
   }
   
   /* Fix SelectTrigger text */
   .text-white .SelectTrigger {
-    color: #ffffff; /* Using direct color value instead of @apply to avoid circular dependency */
+    color: #ffffff;
   }
 
   /* Website name gradient fix */
@@ -139,5 +139,5 @@
 /* Button hover effects */
 .btn-hero-hover {
   @apply bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900 transition-all duration-300;
-  color: #ffffff; /* Using direct color value instead of @apply to avoid circular dependency */
+  color: #ffffff;
 }
