@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,7 @@ export const ProductManagementForm: React.FC<ProductManagementFormProps> = ({
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isCreating, setIsCreating] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch categories
   const { data: categories } = useQuery({
@@ -71,6 +73,7 @@ export const ProductManagementForm: React.FC<ProductManagementFormProps> = ({
       resetForm();
       queryClient.invalidateQueries({ queryKey: ['products-management'] });
       onSuccess && onSuccess();
+      setIsSubmitting(false);
     },
     onError: (error) => {
       console.error("Error creating product:", error);
@@ -79,6 +82,7 @@ export const ProductManagementForm: React.FC<ProductManagementFormProps> = ({
         description: "There was a problem creating the product.",
         variant: "destructive"
       });
+      setIsSubmitting(false);
     }
   });
 
@@ -93,6 +97,7 @@ export const ProductManagementForm: React.FC<ProductManagementFormProps> = ({
       resetForm();
       queryClient.invalidateQueries({ queryKey: ['products-management'] });
       onSuccess && onSuccess();
+      setIsSubmitting(false);
     },
     onError: (error) => {
       console.error("Error updating product:", error);
@@ -101,6 +106,7 @@ export const ProductManagementForm: React.FC<ProductManagementFormProps> = ({
         description: "There was a problem updating the product.",
         variant: "destructive"
       });
+      setIsSubmitting(false);
     }
   });
 
@@ -222,6 +228,7 @@ export const ProductManagementForm: React.FC<ProductManagementFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
     // Validate form
     if (!formData.name || !formData.description || formData.price <= 0) {
@@ -230,6 +237,7 @@ export const ProductManagementForm: React.FC<ProductManagementFormProps> = ({
         description: "Please fill all required fields.",
         variant: "destructive"
       });
+      setIsSubmitting(false);
       return;
     }
     
@@ -267,6 +275,8 @@ export const ProductManagementForm: React.FC<ProductManagementFormProps> = ({
         productFormData.append("images", url);
       });
     }
+    
+    console.log("Submitting product form:", formData);
     
     // Submit the form
     if (isCreating) {
@@ -380,7 +390,7 @@ export const ProductManagementForm: React.FC<ProductManagementFormProps> = ({
                     value={formData.category}
                     onValueChange={(value) => handleSelectChange("category", value)}
                   >
-                    <SelectTrigger className="bg-gray-800/10 border-gray-700/30">
+                    <SelectTrigger className="bg-gray-800/10 border-gray-700/30 text-white">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
@@ -397,7 +407,7 @@ export const ProductManagementForm: React.FC<ProductManagementFormProps> = ({
                     value={formData.theme}
                     onValueChange={(value) => handleSelectChange("theme", value)}
                   >
-                    <SelectTrigger className="bg-gray-800/10 border-gray-700/30">
+                    <SelectTrigger className="bg-gray-800/10 border-gray-700/30 text-white">
                       <SelectValue placeholder="Select theme" />
                     </SelectTrigger>
                     <SelectContent>
@@ -511,15 +521,16 @@ export const ProductManagementForm: React.FC<ProductManagementFormProps> = ({
               variant="outline" 
               onClick={cancelEdit}
               className="bg-transparent text-white border-gray-700 hover:bg-gray-800"
+              disabled={isSubmitting}
             >
               Cancel
             </Button>
             <Button 
               type="submit" 
-              disabled={createProductMutation.isPending || updateProductMutation.isPending}
+              disabled={isSubmitting}
               className="bg-gray-700 text-white hover:bg-gray-600"
             >
-              {(createProductMutation.isPending || updateProductMutation.isPending) ? (
+              {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   {isCreating ? "Creating..." : "Updating..."}

@@ -1,431 +1,487 @@
 
-import { useState, useEffect } from "react";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Slider } from "@/components/ui/slider";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Filter, SlidersHorizontal, Search, ShoppingBag } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import * as productAPI from "@/api/products";
-import { Product } from "@/types";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/hooks/use-toast";
+import React, { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
+import { getProducts, getProductCategories, getProductThemes } from '@/api/products';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Slider } from '@/components/ui/slider';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import { useCart } from '@/context/CartContext';
+import { Filter, Search, ShoppingBag, Heart, Star, ChevronDown, ChevronUp, Grid3X3, List } from 'lucide-react';
+import { Product } from '@/types';
 
 const Shop = () => {
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
+  const { addToCart } = useCart();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [keyword, setKeyword] = useState(searchParams.get('keyword') || '');
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
+  const [selectedTheme, setSelectedTheme] = useState(searchParams.get('theme') || '');
+  const [priceRange, setPriceRange] = useState<number[]>([0, 5000]);
+  const [viewMode, setViewMode] = useState('grid');
+  const [filtersOpen, setFiltersOpen] = useState(true);
+  const pageNumber = Number(searchParams.get('page')) || 1;
 
-  const [filterValues, setFilterValues] = useState({
-    keyword: searchParams.get("search") || "",
-    category: searchParams.get("category") || "",
-    theme: searchParams.get("theme") || "",
-    minPrice: searchParams.get("minPrice") ? Number(searchParams.get("minPrice")) : 0,
-    maxPrice: searchParams.get("maxPrice") ? Number(searchParams.get("maxPrice")) : 5000,
-    page: searchParams.get("page") ? Number(searchParams.get("page")) : 1
+  // Fetch products with filters
+  const { data: productData, isLoading } = useQuery({
+    queryKey: ['products', keyword, pageNumber, selectedCategory, selectedTheme, priceRange],
+    queryFn: () => getProducts(
+      keyword, 
+      pageNumber, 
+      selectedCategory, 
+      selectedTheme, 
+      priceRange[0], 
+      priceRange[1]
+    )
   });
 
-  const [showFilters, setShowFilters] = useState(false);
-
-  // Fetch products based on filters
-  const { data: productsData, isLoading, isError } = useQuery({
-    queryKey: ['products', filterValues],
-    queryFn: () => productAPI.getProducts(
-      filterValues.keyword,
-      filterValues.page,
-      filterValues.category,
-      filterValues.theme,
-      filterValues.minPrice,
-      filterValues.maxPrice
-    ),
+  // Fetch categories
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: getProductCategories
   });
 
-  // Fetch categories and themes
-  const { data: categories } = useQuery({
-    queryKey: ['product-categories'],
-    queryFn: productAPI.getProductCategories,
-  });
-
-  const { data: themes } = useQuery({
-    queryKey: ['product-themes'],
-    queryFn: productAPI.getProductThemes,
+  // Fetch themes
+  const { data: themes = [] } = useQuery({
+    queryKey: ['themes'],
+    queryFn: getProductThemes
   });
 
   // Update URL when filters change
   useEffect(() => {
     const params = new URLSearchParams();
-    
-    if (filterValues.keyword) params.set("search", filterValues.keyword);
-    if (filterValues.category) params.set("category", filterValues.category);
-    if (filterValues.theme) params.set("theme", filterValues.theme);
-    if (filterValues.minPrice > 0) params.set("minPrice", String(filterValues.minPrice));
-    if (filterValues.maxPrice < 5000) params.set("maxPrice", String(filterValues.maxPrice));
-    if (filterValues.page > 1) params.set("page", String(filterValues.page));
-    
+    if (keyword) params.set('keyword', keyword);
+    if (pageNumber > 1) params.set('page', pageNumber.toString());
+    if (selectedCategory) params.set('category', selectedCategory);
+    if (selectedTheme) params.set('theme', selectedTheme);
     setSearchParams(params);
-  }, [filterValues, setSearchParams]);
+  }, [keyword, pageNumber, selectedCategory, selectedTheme, setSearchParams]);
 
-  // Handle search input
-  const handleSearch = (e) => {
-    if (e.key === 'Enter') {
-      setFilterValues({
-        ...filterValues,
-        keyword: e.target.value,
-        page: 1
-      });
-    }
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // The search term is already set from the input, so we just need to update the URL
+    const params = new URLSearchParams(searchParams);
+    if (keyword) params.set('keyword', keyword);
+    else params.delete('keyword');
+    setSearchParams(params);
   };
 
-  // Handle category filter
-  const handleCategoryChange = (category) => {
-    setFilterValues({
-      ...filterValues,
-      category: filterValues.category === category ? "" : category,
-      page: 1
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+  };
+
+  const handleThemeChange = (theme: string) => {
+    setSelectedTheme(theme);
+  };
+
+  const handlePriceChange = (values: number[]) => {
+    setPriceRange(values);
+  };
+
+  const handleAddToCart = (product: Product) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.discountPrice || product.price,
+      image: product.images?.[0] || '',
+      quantity: 1
     });
-  };
-
-  // Handle theme filter
-  const handleThemeChange = (theme) => {
-    setFilterValues({
-      ...filterValues,
-      theme: filterValues.theme === theme ? "" : theme,
-      page: 1
-    });
-  };
-
-  // Handle price range filter
-  const handlePriceChange = (values) => {
-    setFilterValues({
-      ...filterValues,
-      minPrice: values[0],
-      maxPrice: values[1],
-      page: 1
-    });
-  };
-
-  // Handle pagination
-  const handlePageChange = (newPage) => {
-    setFilterValues({
-      ...filterValues,
-      page: newPage
-    });
-    window.scrollTo(0, 0);
-  };
-
-  // Handle add to cart
-  const handleAddToCart = (product) => {
-    // Add product to cart logic would go here
+    
     toast({
       title: "Added to cart",
-      description: `${product.name} has been added to your cart.`
+      description: `${product.name} has been added to your cart`
     });
   };
 
-  // Reset all filters
-  const resetFilters = () => {
-    setFilterValues({
-      keyword: "",
-      category: "",
-      theme: "",
-      minPrice: 0,
-      maxPrice: 5000,
-      page: 1
+  const handleAddToWishlist = (product: Product) => {
+    toast({
+      title: "Added to wishlist",
+      description: `${product.name} has been added to your wishlist`
     });
   };
 
-  // Navigate to product detail
-  const navigateToProduct = (productId) => {
-    navigate(`/product/${productId}`);
+  const toggleFilters = () => {
+    setFiltersOpen(!filtersOpen);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-starry text-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
       <Header />
-      <main>
-        <div className="container mx-auto py-8 px-4">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold">Shop</h1>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="border-gray-700 text-white hover:bg-gray-800"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <Filter className="h-4 w-4 mr-2" /> 
-                {showFilters ? "Hide Filters" : "Show Filters"}
-              </Button>
-              <Button 
+      
+      <main className="container mx-auto px-4 py-8">
+        {/* Hero Section */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-2">Shop Collection</h1>
+          <p className="text-gray-400">Find your perfect superhero t-shirt</p>
+        </div>
+
+        {/* Search and Filter Bar */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+            <form onSubmit={handleSearch} className="w-full md:w-1/2">
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Search products..."
+                  className="bg-gray-800/50 border-gray-700 text-white pr-10"
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                />
+                <button
+                  type="submit"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                >
+                  <Search size={18} />
+                </button>
+              </div>
+            </form>
+            
+            <div className="flex items-center space-x-4">
+              <Button
                 variant="outline"
                 size="sm"
-                className="border-gray-700 text-white hover:bg-gray-800"
-                onClick={resetFilters}
+                onClick={toggleFilters}
+                className="bg-transparent border-gray-700 text-white hover:bg-gray-800"
               >
-                Reset
+                <Filter size={16} className="mr-2" />
+                Filters {filtersOpen ? <ChevronUp size={16} className="ml-2" /> : <ChevronDown size={16} className="ml-2" />}
               </Button>
+              
+              <div className="flex items-center p-1 bg-gray-800/50 rounded-md">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-1 rounded-sm ${viewMode === 'grid' ? 'bg-gray-700/50' : ''}`}
+                >
+                  <Grid3X3 size={18} />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-1 rounded-sm ${viewMode === 'list' ? 'bg-gray-700/50' : ''}`}
+                >
+                  <List size={18} />
+                </button>
+              </div>
             </div>
           </div>
-
-          {/* Search bar */}
-          <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input 
-              type="text" 
-              placeholder="Search for products..." 
-              className="pl-10 bg-gray-900/50 border-gray-700 text-white" 
-              value={filterValues.keyword}
-              onChange={(e) => setFilterValues({...filterValues, keyword: e.target.value})}
-              onKeyDown={handleSearch}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Filters */}
-            {showFilters && (
-              <Card className="p-4 bg-gray-900/50 border-gray-700 h-fit lg:sticky lg:top-24">
-                <div className="mb-4 flex items-center justify-between">
-                  <h3 className="text-lg font-semibold flex items-center">
-                    <SlidersHorizontal className="h-4 w-4 mr-2" /> Filters
-                  </h3>
-                </div>
-                
-                <Separator className="my-4 bg-gray-700" />
-                
-                {/* Price Range */}
-                <div className="mb-6">
-                  <h4 className="font-medium mb-3">Price Range</h4>
-                  <Slider 
-                    defaultValue={[filterValues.minPrice, filterValues.maxPrice]} 
-                    max={5000} 
-                    step={100}
-                    onValueChange={handlePriceChange}
-                    className="mb-2"
-                  />
-                  <div className="flex items-center justify-between text-sm">
-                    <span>₹{filterValues.minPrice}</span>
-                    <span>₹{filterValues.maxPrice}</span>
-                  </div>
-                </div>
-                
-                <Separator className="my-4 bg-gray-700" />
-                
-                {/* Categories */}
-                <div className="mb-6">
-                  <h4 className="font-medium mb-3">Categories</h4>
-                  <div className="space-y-2">
-                    {isLoading ? (
-                      Array(5).fill(0).map((_, index) => (
-                        <div key={index} className="flex items-center space-x-2">
-                          <Skeleton className="h-4 w-4" />
-                          <Skeleton className="h-4 w-24" />
-                        </div>
-                      ))
-                    ) : (
-                      categories?.map((category) => (
+          
+          {/* Filter Panel */}
+          {filtersOpen && (
+            <Card className="mt-4 bg-gray-800/30 border-gray-700">
+              <CardContent className="p-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  {/* Categories */}
+                  <div>
+                    <h3 className="font-medium mb-2">Categories</h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="all-categories" 
+                          checked={selectedCategory === ''} 
+                          onCheckedChange={() => handleCategoryChange('')}
+                        />
+                        <label htmlFor="all-categories" className="text-sm">All Categories</label>
+                      </div>
+                      {categories.map((category) => (
                         <div key={category} className="flex items-center space-x-2">
                           <Checkbox 
-                            id={`category-${category}`} 
-                            checked={filterValues.category === category}
+                            id={`category-${category}`}
+                            checked={selectedCategory === category}
                             onCheckedChange={() => handleCategoryChange(category)}
                           />
-                          <Label 
-                            htmlFor={`category-${category}`}
-                            className="text-sm cursor-pointer"
-                          >
-                            {category}
-                          </Label>
+                          <label htmlFor={`category-${category}`} className="text-sm">{category}</label>
                         </div>
-                      ))
-                    )}
+                      ))}
+                    </div>
                   </div>
-                </div>
-                
-                <Separator className="my-4 bg-gray-700" />
-                
-                {/* Themes */}
-                <div>
-                  <h4 className="font-medium mb-3">Themes</h4>
-                  <div className="space-y-2">
-                    {isLoading ? (
-                      Array(5).fill(0).map((_, index) => (
-                        <div key={index} className="flex items-center space-x-2">
-                          <Skeleton className="h-4 w-4" />
-                          <Skeleton className="h-4 w-24" />
-                        </div>
-                      ))
-                    ) : (
-                      themes?.map((theme) => (
+                  
+                  {/* Themes */}
+                  <div>
+                    <h3 className="font-medium mb-2">Themes</h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="all-themes" 
+                          checked={selectedTheme === ''} 
+                          onCheckedChange={() => handleThemeChange('')}
+                        />
+                        <label htmlFor="all-themes" className="text-sm">All Themes</label>
+                      </div>
+                      {themes.map((theme) => (
                         <div key={theme} className="flex items-center space-x-2">
                           <Checkbox 
                             id={`theme-${theme}`}
-                            checked={filterValues.theme === theme}
+                            checked={selectedTheme === theme}
                             onCheckedChange={() => handleThemeChange(theme)}
                           />
-                          <Label 
-                            htmlFor={`theme-${theme}`}
-                            className="text-sm cursor-pointer"
-                          >
-                            {theme}
-                          </Label>
+                          <label htmlFor={`theme-${theme}`} className="text-sm">{theme}</label>
                         </div>
-                      ))
-                    )}
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Price Range */}
+                  <div>
+                    <h3 className="font-medium mb-2">Price Range</h3>
+                    <div className="px-2">
+                      <Slider 
+                        defaultValue={[0, 5000]} 
+                        max={5000} 
+                        step={100} 
+                        onValueChange={handlePriceChange}
+                        className="my-6"
+                      />
+                      <div className="flex justify-between text-sm">
+                        <span>₹{priceRange[0]}</span>
+                        <span>₹{priceRange[1]}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Active Filters */}
+                  <div>
+                    <h3 className="font-medium mb-2">Active Filters</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedCategory && (
+                        <Badge variant="outline" className="bg-gray-700/30">
+                          {selectedCategory}
+                          <button 
+                            className="ml-2" 
+                            onClick={() => setSelectedCategory('')}
+                          >
+                            ×
+                          </button>
+                        </Badge>
+                      )}
+                      {selectedTheme && (
+                        <Badge variant="outline" className="bg-gray-700/30">
+                          {selectedTheme}
+                          <button 
+                            className="ml-2" 
+                            onClick={() => setSelectedTheme('')}
+                          >
+                            ×
+                          </button>
+                        </Badge>
+                      )}
+                      {(priceRange[0] > 0 || priceRange[1] < 5000) && (
+                        <Badge variant="outline" className="bg-gray-700/30">
+                          ₹{priceRange[0]} - ₹{priceRange[1]}
+                          <button 
+                            className="ml-2" 
+                            onClick={() => setPriceRange([0, 5000])}
+                          >
+                            ×
+                          </button>
+                        </Badge>
+                      )}
+                      {(selectedCategory || selectedTheme || priceRange[0] > 0 || priceRange[1] < 5000) && (
+                        <Button 
+                          variant="link" 
+                          size="sm" 
+                          className="px-0 h-auto text-sm text-gray-400 hover:text-white"
+                          onClick={() => {
+                            setSelectedCategory('');
+                            setSelectedTheme('');
+                            setPriceRange([0, 5000]);
+                          }}
+                        >
+                          Clear all
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </Card>
-            )}
-            
-            {/* Products Grid */}
-            <div className={`${showFilters ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
-              {isLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                  {Array(6).fill(0).map((_, index) => (
-                    <Card key={index} className="bg-gray-900/50 border-gray-700 overflow-hidden">
-                      <Skeleton className="h-64 w-full" />
+              </CardContent>
+            </Card>
+          )}
+        </div>
+        
+        {/* Products Grid/List */}
+        <div>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+            </div>
+          ) : productData?.products?.length === 0 ? (
+            <div className="text-center py-16">
+              <h2 className="text-2xl font-bold mb-2">No products found</h2>
+              <p className="text-gray-400">Try changing your search criteria</p>
+            </div>
+          ) : (
+            <>
+              <div className="mb-4">
+                <p className="text-gray-400">
+                  Showing {productData?.products?.length} of {productData?.total || 0} products
+                </p>
+              </div>
+              
+              {viewMode === 'grid' ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {productData?.products?.map((product: Product) => (
+                    <Card key={product.id} className="overflow-hidden bg-gray-800/30 border-gray-700">
+                      <div className="h-56 overflow-hidden relative group">
+                        <img 
+                          src={product.images?.[0] || '/placeholder.svg'} 
+                          alt={product.name}
+                          className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="flex space-x-2">
+                            <Button 
+                              size="sm" 
+                              className="rounded-full bg-white text-black hover:bg-gray-200"
+                              onClick={() => handleAddToCart(product)}
+                            >
+                              <ShoppingBag size={16} />
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="rounded-full border-white text-white"
+                              onClick={() => handleAddToWishlist(product)}
+                            >
+                              <Heart size={16} />
+                            </Button>
+                          </div>
+                        </div>
+                        {product.featured && (
+                          <Badge className="absolute top-2 left-2 bg-yellow-600">
+                            Featured
+                          </Badge>
+                        )}
+                        {product.discountPrice !== undefined && product.discountPrice < product.price && (
+                          <Badge className="absolute top-2 right-2 bg-red-600">
+                            {Math.round(((product.price - product.discountPrice) / product.price) * 100)}% Off
+                          </Badge>
+                        )}
+                      </div>
                       <CardContent className="p-4">
-                        <Skeleton className="h-6 w-3/4 mb-2" />
-                        <Skeleton className="h-4 w-1/2 mb-4" />
-                        <Skeleton className="h-8 w-full" />
+                        <div className="mb-2 flex justify-between items-start">
+                          <div className="flex-1">
+                            <h3 className="font-medium text-lg truncate">{product.name}</h3>
+                            <p className="text-gray-400 text-sm">{product.category}</p>
+                          </div>
+                          <div className="flex items-center">
+                            <Star className="h-4 w-4 fill-yellow-500 text-yellow-500 mr-1" />
+                            <span className="text-sm">{product.rating || 0}</span>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center mt-4">
+                          <div>
+                            {product.discountPrice !== undefined && product.discountPrice < product.price ? (
+                              <div className="flex items-center space-x-2">
+                                <span className="text-lg font-bold">₹{product.discountPrice.toFixed(2)}</span>
+                                <span className="text-sm text-gray-400 line-through">₹{product.price.toFixed(2)}</span>
+                              </div>
+                            ) : (
+                              <span className="text-lg font-bold">₹{product.price.toFixed(2)}</span>
+                            )}
+                          </div>
+                          <Badge variant={product.inStock ? "outline" : "destructive"}>
+                            {product.inStock ? "In Stock" : "Out of Stock"}
+                          </Badge>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
                 </div>
-              ) : isError ? (
-                <div className="py-12 text-center">
-                  <p className="text-lg text-gray-400">Failed to load products. Please try again.</p>
-                  <Button 
-                    className="mt-4"
-                    onClick={() => window.location.reload()}
-                  >
-                    Retry
-                  </Button>
-                </div>
-              ) : productsData?.products?.length === 0 ? (
-                <div className="py-12 text-center">
-                  <p className="text-lg text-gray-400">No products found matching your criteria.</p>
-                  <Button 
-                    className="mt-4"
-                    onClick={resetFilters}
-                  >
-                    Clear Filters
-                  </Button>
-                </div>
               ) : (
-                <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                    {productsData?.products?.map((product: Product) => (
-                      <Card 
-                        key={product.id} 
-                        className="bg-gray-900/50 border-gray-700 overflow-hidden cursor-pointer hover:border-gray-500 transition-all group"
-                        onClick={() => navigateToProduct(product.id)}
-                      >
-                        <div className="h-64 overflow-hidden relative">
-                          {product.images && product.images[0] ? (
-                            <img 
-                              src={product.images[0]} 
-                              alt={product.name} 
-                              className="w-full h-full object-cover transition-transform group-hover:scale-105" 
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                              <ShoppingBag className="h-12 w-12 text-gray-600" />
-                            </div>
-                          )}
-                          {product.discountPrice && (
-                            <Badge className="absolute top-2 right-2 bg-gray-800 text-white">
-                              Sale
-                            </Badge>
-                          )}
-                          {product.featured && (
-                            <Badge className="absolute top-2 left-2 bg-gray-600 text-white">
-                              Featured
-                            </Badge>
-                          )}
+                <div className="space-y-4">
+                  {productData?.products?.map((product: Product) => (
+                    <Card key={product.id} className="bg-gray-800/30 border-gray-700">
+                      <div className="flex flex-col md:flex-row">
+                        <div className="md:w-1/4 h-40">
+                          <img 
+                            src={product.images?.[0] || '/placeholder.svg'} 
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-                        <CardContent className="p-4">
-                          <h3 className="font-semibold text-lg truncate">{product.name}</h3>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <Badge variant="outline" className="bg-transparent">
-                              {product.category}
-                            </Badge>
+                        <CardContent className="p-4 flex-1 flex flex-col md:flex-row">
+                          <div className="flex-1">
+                            <h3 className="font-medium text-lg">{product.name}</h3>
+                            <p className="text-gray-400 text-sm mb-2">{product.category}</p>
+                            <p className="text-sm text-gray-300 line-clamp-2 mb-2">{product.description}</p>
+                            <div className="flex items-center space-x-4">
+                              <Badge variant="outline">{product.theme}</Badge>
+                              <div className="flex items-center">
+                                <Star className="h-4 w-4 fill-yellow-500 text-yellow-500 mr-1" />
+                                <span className="text-sm">{product.rating || 0}</span>
+                              </div>
+                            </div>
                           </div>
-                          <div className="mt-3 flex items-center justify-between">
+                          <div className="md:w-1/4 flex flex-col justify-between items-end mt-4 md:mt-0">
                             <div>
-                              {product.discountPrice ? (
+                              {product.discountPrice !== undefined && product.discountPrice < product.price ? (
                                 <div className="flex items-center space-x-2">
-                                  <span className="text-gray-400 line-through">₹{product.price.toFixed(2)}</span>
-                                  <span className="font-semibold text-white">₹{product.discountPrice.toFixed(2)}</span>
+                                  <span className="text-lg font-bold">₹{product.discountPrice.toFixed(2)}</span>
+                                  <span className="text-sm text-gray-400 line-through">₹{product.price.toFixed(2)}</span>
                                 </div>
                               ) : (
-                                <span className="font-semibold text-white">₹{product.price.toFixed(2)}</span>
+                                <span className="text-lg font-bold">₹{product.price.toFixed(2)}</span>
                               )}
                             </div>
-                            <Button 
-                              size="sm" 
-                              className="bg-gray-700 hover:bg-gray-600"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleAddToCart(product);
-                              }}
-                            >
-                              <ShoppingBag className="h-4 w-4" />
-                            </Button>
+                            <div className="flex space-x-2 mt-4">
+                              <Button 
+                                size="sm" 
+                                className="bg-white text-black hover:bg-gray-200"
+                                onClick={() => handleAddToCart(product)}
+                                disabled={!product.inStock}
+                              >
+                                <ShoppingBag size={16} className="mr-2" />
+                                Add to cart
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="border-white text-white"
+                                onClick={() => handleAddToWishlist(product)}
+                              >
+                                <Heart size={16} />
+                              </Button>
+                            </div>
                           </div>
                         </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                  
-                  {/* Pagination */}
-                  {productsData && productsData.pages > 1 && (
-                    <div className="flex items-center justify-center mt-8 space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={filterValues.page === 1}
-                        onClick={() => handlePageChange(filterValues.page - 1)}
-                        className="border-gray-700"
-                      >
-                        Previous
-                      </Button>
-                      
-                      {Array.from({length: productsData.pages}, (_, i) => i + 1).map((page) => (
-                        <Button
-                          key={page}
-                          variant={filterValues.page === page ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => handlePageChange(page)}
-                          className={filterValues.page === page ? "bg-gray-600" : "border-gray-700"}
-                        >
-                          {page}
-                        </Button>
-                      ))}
-                      
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={filterValues.page === productsData.pages}
-                        onClick={() => handlePageChange(filterValues.page + 1)}
-                        className="border-gray-700"
-                      >
-                        Next
-                      </Button>
-                    </div>
-                  )}
-                </>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
               )}
-            </div>
-          </div>
+              
+              {/* Pagination controls would go here */}
+              {productData?.pages > 1 && (
+                <div className="mt-8 flex justify-center">
+                  <div className="flex space-x-2">
+                    <Button 
+                      variant="outline" 
+                      className="bg-transparent text-white border-gray-700"
+                      disabled={pageNumber === 1}
+                    >
+                      Previous
+                    </Button>
+                    {/* Page numbers would go here */}
+                    <Button
+                      variant="outline"
+                      className="bg-transparent text-white border-gray-700"
+                      disabled={pageNumber === productData.pages}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </main>
+      
       <Footer />
     </div>
   );

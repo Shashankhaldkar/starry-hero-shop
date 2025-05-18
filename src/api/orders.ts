@@ -44,3 +44,25 @@ export const getMyOrders = async () => {
     throw error;
   }
 };
+
+// Get all orders (admin)
+export const getAllOrders = async () => {
+  try {
+    const { data } = await API.get('/orders');
+    return data;
+  } catch (error) {
+    console.error('Error fetching all orders:', error);
+    throw error;
+  }
+};
+
+// Update order status (admin)
+export const updateOrderStatus = async (orderId: string, status: string) => {
+  try {
+    const { data } = await API.put(`/orders/${orderId}/status`, { status });
+    return data;
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    throw error;
+  }
+};

@@ -98,9 +98,7 @@ export const AdminProductAnalytics = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white">Product Management & Analytics</h2>
-      
+    <div className="space-y-6">      
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="bg-gray-900/40 border border-gray-700/30 rounded-lg p-1 mb-6">
           <TabsTrigger 
