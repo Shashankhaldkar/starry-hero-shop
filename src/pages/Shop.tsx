@@ -31,14 +31,12 @@ const Shop = () => {
   // Fetch products with filters
   const { data: productData, isLoading } = useQuery({
     queryKey: ['products', keyword, pageNumber, selectedCategory, selectedTheme, priceRange],
-    queryFn: () => getProducts(
+    queryFn: () => getProducts({
       keyword, 
-      pageNumber, 
-      selectedCategory, 
-      selectedTheme, 
-      priceRange[0], 
-      priceRange[1]
-    )
+      page: pageNumber, 
+      category: selectedCategory, 
+      theme: selectedTheme
+    })
   });
 
   // Fetch categories

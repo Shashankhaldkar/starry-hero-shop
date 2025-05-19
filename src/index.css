@@ -86,7 +86,21 @@
     @apply bg-background text-foreground;
   }
 
-  /* Fix white text on white background in inputs */
+  /* Fix text color based on background */
+  .bg-white, .bg-gray-100, .bg-gray-200, .bg-admin-white, [class*="bg-slate"], [class*="bg-zinc"], 
+  .bg-background:not(.dark *), .bg-card:not(.dark *), .bg-popover:not(.dark *), 
+  .bg-muted:not(.dark *), .bg-secondary:not(.dark *) {
+    @apply text-black;
+  }
+  
+  .bg-black, .bg-gray-800, .bg-gray-900, .bg-admin-black, .bg-admin-darkGrey, .bg-admin-grey, 
+  .bg-gradient-to-b, .bg-gradient-dark, .dark *, .bg-gray-800\/30, .bg-gray-700\/30, .bg-gray-700\/50, .bg-gray-800\/50,
+  [class*="from-gray-900"], [class*="from-starry"], [class*="bg-starry"],
+  [class*="from-admin-black"], [class*="bg-admin-darkGrey"] {
+    @apply text-white;
+  }
+
+  /* Fix input text specifically */
   input, textarea, select {
     @apply text-black;
   }
@@ -98,13 +112,37 @@
   .bg-admin-darkGrey select,
   [class*="bg-admin"] input,
   [class*="bg-admin"] textarea,
-  [class*="bg-admin"] select {
+  [class*="bg-admin"] select,
+  .bg-black input,
+  .bg-gray-800 input,
+  .bg-gray-900 input,
+  .bg-gradient-to-b input,
+  .bg-starry-darkPurple input,
+  .dark input,
+  .dark textarea,
+  .dark select {
     color: white;
   }
   
   /* Fix SelectTrigger text */
-  .text-white .SelectTrigger {
+  .text-white .SelectTrigger,
+  [class*="bg-admin"] .SelectTrigger,
+  .bg-black .SelectTrigger,
+  .bg-gray-800 .SelectTrigger,
+  .bg-gray-900 .SelectTrigger,
+  .dark .SelectTrigger {
     color: white;
+  }
+
+  /* Fix placeholders */
+  [class*="bg-admin"] input::placeholder,
+  .bg-black input::placeholder,
+  .bg-gray-800 input::placeholder,
+  .bg-gray-900 input::placeholder,
+  .dark input::placeholder,
+  .bg-gradient-to-b input::placeholder,
+  .bg-starry-darkPurple input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
   }
 
   /* Website name gradient fix */
