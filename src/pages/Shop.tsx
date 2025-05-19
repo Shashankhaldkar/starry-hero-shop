@@ -454,7 +454,7 @@ const Shop = () => {
                 </div>
               )}
               
-              {/* Pagination controls would go here */}
+              {/* Pagination controls */}
               {productData?.pages > 1 && (
                 <div className="mt-8 flex justify-center">
                   <div className="flex space-x-2">
