@@ -1,4 +1,3 @@
-
 export interface Product {
   id: string;
   name: string;
@@ -16,6 +15,7 @@ export interface Product {
   featured?: boolean;
   stock: number;
   reviews?: Review[];
+  createdAt?: string; // Add the createdAt property
 }
 
 export interface Review {

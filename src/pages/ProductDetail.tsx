@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from '@tanstack/react-query';
 import { getProductById, getRelatedProducts, getProductReviews, addProductReview } from '@/api/products';
 import { Header } from '@/components/Header';
