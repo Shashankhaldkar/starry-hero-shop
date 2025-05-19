@@ -1,15 +1,13 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
-import { AccountSidebar } from "@/components/account/AccountSidebar";
 import { ProfileTab } from "@/components/account/ProfileTab";
 import { OrdersTab } from "@/components/account/OrdersTab";
 import { WishlistTab } from "@/components/account/WishlistTab";
 import { AddressesTab } from "@/components/account/AddressesTab";
+import { AccountLayout } from "@/components/account/AccountLayout";
 
 const Account = () => {
   const { logout } = useAuth();
@@ -26,29 +24,29 @@ const Account = () => {
     });
   };
 
+  const renderActiveTab = () => {
+    switch(activeTab) {
+      case "profile":
+        return <ProfileTab />;
+      case "orders":
+        return <OrdersTab />;
+      case "wishlist":
+        return <WishlistTab />;
+      case "addresses":
+        return <AddressesTab />;
+      default:
+        return <ProfileTab />;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-starry-darkPurple to-starry-darkBlue text-white">
-      <Header />
-      <main className="container mx-auto py-12 px-4">
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="md:w-1/4">
-            <AccountSidebar 
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              handleLogout={handleLogout}
-            />
-          </div>
-          
-          <div className="md:w-3/4">
-            {activeTab === "profile" && <ProfileTab />}
-            {activeTab === "orders" && <OrdersTab />}
-            {activeTab === "wishlist" && <WishlistTab />}
-            {activeTab === "addresses" && <AddressesTab />}
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <AccountLayout
+      activeTab={activeTab}
+      setActiveTab={setActiveTab}
+      handleLogout={handleLogout}
+    >
+      {renderActiveTab()}
+    </AccountLayout>
   );
 };
 

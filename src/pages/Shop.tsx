@@ -1,486 +1,264 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { ProductCard } from "@/components/ProductCard";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Pagination } from "@/components/ui/pagination"
 import { useSearchParams } from 'react-router-dom';
-import { getProducts, getProductCategories, getProductThemes } from '@/api/products';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Slider } from '@/components/ui/slider';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
-import { useCart } from '@/context/CartContext';
-import { Filter, Search, ShoppingBag, Heart, Star, ChevronDown, ChevronUp, Grid3X3, List } from 'lucide-react';
-import { Product } from '@/types';
+import * as productAPI from "@/api/products";
 
 const Shop = () => {
-  const { toast } = useToast();
-  const { addToCart } = useCart();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [keyword, setKeyword] = useState(searchParams.get('keyword') || '');
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
-  const [selectedTheme, setSelectedTheme] = useState(searchParams.get('theme') || '');
-  const [priceRange, setPriceRange] = useState<number[]>([0, 5000]);
-  const [viewMode, setViewMode] = useState('grid');
-  const [filtersOpen, setFiltersOpen] = useState(true);
-  const pageNumber = Number(searchParams.get('page')) || 1;
+  const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('keyword') || "");
+  const [currentPage, setCurrentPage] = useState(Number(searchParams.get('page')) || 1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || "all");
+  const [selectedTheme, setSelectedTheme] = useState(searchParams.get('theme') || "all");
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
+  const [categories, setCategories] = useState<string[]>([]);
+  const [themes, setThemes] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch products with filters
-  const { data: productData, isLoading } = useQuery({
-    queryKey: ['products', keyword, pageNumber, selectedCategory, selectedTheme, priceRange],
-    queryFn: () => getProducts({
-      keyword, 
-      page: pageNumber, 
-      category: selectedCategory, 
-      theme: selectedTheme,
-      minPrice: priceRange[0],
-      maxPrice: priceRange[1]
-    })
-  });
-
-  // Fetch categories
-  const { data: categories = [] } = useQuery({
-    queryKey: ['categories'],
-    queryFn: getProductCategories
-  });
-
-  // Fetch themes
-  const { data: themes = [] } = useQuery({
-    queryKey: ['themes'],
-    queryFn: getProductThemes
-  });
-
-  // Update URL when filters change
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (keyword) params.set('keyword', keyword);
-    if (pageNumber > 1) params.set('page', pageNumber.toString());
-    if (selectedCategory) params.set('category', selectedCategory);
-    if (selectedTheme) params.set('theme', selectedTheme);
-    setSearchParams(params);
-  }, [keyword, pageNumber, selectedCategory, selectedTheme, setSearchParams]);
+    const fetchCategoriesAndThemes = async () => {
+      try {
+        const fetchedCategories = await productAPI.getProductCategories();
+        const fetchedThemes = await productAPI.getProductThemes();
+        setCategories(["all", ...fetchedCategories]);
+        setThemes(["all", ...fetchedThemes]);
+      } catch (error) {
+        console.error("Error fetching categories and themes:", error);
+      }
+    };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // The search term is already set from the input, so we just need to update the URL
-    const params = new URLSearchParams(searchParams);
-    if (keyword) params.set('keyword', keyword);
-    else params.delete('keyword');
-    setSearchParams(params);
+    fetchCategoriesAndThemes();
+  }, []);
+
+  useEffect(() => {
+    const initialPriceRange = async () => {
+      try {
+        const fetchedProducts = await productAPI.getProducts({
+          keyword: searchTerm,
+          page: currentPage,
+          category: selectedCategory,
+          theme: selectedTheme,
+        });
+        if (fetchedProducts.products && fetchedProducts.products.length > 0) {
+          const prices = fetchedProducts.products.map((product) => product.price);
+          const minPrice = Math.min(...prices);
+          const maxPrice = Math.max(...prices);
+          setPriceRange({ min: minPrice, max: maxPrice });
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+    initialPriceRange()
+  }, [])
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      try {
+        const data = await productAPI.getProducts({
+          keyword: searchTerm,
+          page: currentPage,
+          category: selectedCategory,
+          theme: selectedTheme,
+          minPrice: priceRange?.min,
+          maxPrice: priceRange?.max
+        });
+        setProducts(data.products);
+        setTotalPages(data.pages);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        setProducts([]);
+        setTotalPages(1);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [searchTerm, currentPage, selectedCategory, selectedTheme, priceRange]);
+
+  useEffect(() => {
+    const newParams = new URLSearchParams(location.search);
+    if (searchTerm) {
+      newParams.set('keyword', searchTerm);
+    } else {
+      newParams.delete('keyword');
+    }
+    if (currentPage > 1) {
+      newParams.set('page', String(currentPage));
+    } else {
+      newParams.delete('page');
+    }
+    if (selectedCategory !== "all") {
+      newParams.set('category', selectedCategory);
+    } else {
+      newParams.delete('category');
+    }
+     if (selectedTheme !== "all") {
+      newParams.set('theme', selectedTheme);
+    } else {
+      newParams.delete('theme');
+    }
+    setSearchParams(newParams);
+  }, [searchTerm, currentPage, selectedCategory, selectedTheme, setSearchParams, location.search]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
   };
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
+    setCurrentPage(1);
   };
 
   const handleThemeChange = (theme: string) => {
     setSelectedTheme(theme);
+    setCurrentPage(1);
   };
 
-  const handlePriceChange = (values: number[]) => {
-    setPriceRange(values);
-  };
-
-  const handleAddToCart = (product: Product) => {
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.discountPrice || product.price,
-      image: product.images?.[0] || '',
-      quantity: 1
-    });
-    
-    toast({
-      title: "Added to cart",
-      description: `${product.name} has been added to your cart`
-    });
-  };
-
-  const handleAddToWishlist = (product: Product) => {
-    toast({
-      title: "Added to wishlist",
-      description: `${product.name} has been added to your wishlist`
-    });
-  };
-
-  const toggleFilters = () => {
-    setFiltersOpen(!filtersOpen);
+  const handlePriceChange = (value: number[]) => {
+    setPriceRange({ min: value[0], max: value[1] });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-b from-starry-darkPurple to-starry-darkBlue text-white">
       <Header />
-      
-      <main className="container mx-auto px-4 py-8">
-        {/* Hero Section */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Shop Collection</h1>
-          <p className="text-gray-400">Find your perfect superhero t-shirt</p>
-        </div>
-
-        {/* Search and Filter Bar */}
-        <div className="mb-8">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <form onSubmit={handleSearch} className="w-full md:w-1/2">
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder="Search products..."
-                  className="bg-gray-800/50 border-gray-700 text-white pr-10"
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
-                />
-                <button
-                  type="submit"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-                >
-                  <Search size={18} />
-                </button>
-              </div>
-            </form>
-            
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={toggleFilters}
-                className="bg-transparent border-gray-700 text-white hover:bg-gray-800"
-              >
-                <Filter size={16} className="mr-2" />
-                Filters {filtersOpen ? <ChevronUp size={16} className="ml-2" /> : <ChevronDown size={16} className="ml-2" />}
-              </Button>
-              
-              <div className="flex items-center p-1 bg-gray-800/50 rounded-md">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-1 rounded-sm ${viewMode === 'grid' ? 'bg-gray-700/50' : ''}`}
-                >
-                  <Grid3X3 size={18} />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-1 rounded-sm ${viewMode === 'list' ? 'bg-gray-700/50' : ''}`}
-                >
-                  <List size={18} />
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          {/* Filter Panel */}
-          {filtersOpen && (
-            <Card className="mt-4 bg-gray-800/30 border-gray-700">
-              <CardContent className="p-4">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                  {/* Categories */}
-                  <div>
-                    <h3 className="font-medium mb-2">Categories</h3>
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="all-categories" 
-                          checked={selectedCategory === ''} 
-                          onCheckedChange={() => handleCategoryChange('')}
-                        />
-                        <label htmlFor="all-categories" className="text-sm">All Categories</label>
-                      </div>
+      <main className="container mx-auto py-12 px-4">
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Filters Section */}
+          <div className="md:w-1/4">
+            <Card className="bg-starry-darkPurple/40 border-starry-purple/30">
+              <CardHeader>
+                <CardTitle>Filters</CardTitle>
+                <CardDescription>Filter products based on your preferences</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Search */}
+                <div className="space-y-2">
+                  <Label htmlFor="search">Search</Label>
+                  <Input
+                    type="search"
+                    id="search"
+                    placeholder="Search products..."
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                  />
+                </div>
+                {/* Category */}
+                <div className="space-y-2">
+                  <Label>Category</Label>
+                  <Select onValueChange={handleCategoryChange} defaultValue={selectedCategory}>
+                    <SelectTrigger className="bg-transparent text-white">
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-starry-darkPurple border-starry-purple">
                       {categories.map((category) => (
-                        <div key={category} className="flex items-center space-x-2">
-                          <Checkbox 
-                            id={`category-${category}`}
-                            checked={selectedCategory === category}
-                            onCheckedChange={() => handleCategoryChange(category)}
-                          />
-                          <label htmlFor={`category-${category}`} className="text-sm">{category}</label>
-                        </div>
+                        <SelectItem key={category} value={category}>{category}</SelectItem>
                       ))}
-                    </div>
-                  </div>
-                  
-                  {/* Themes */}
-                  <div>
-                    <h3 className="font-medium mb-2">Themes</h3>
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="all-themes" 
-                          checked={selectedTheme === ''} 
-                          onCheckedChange={() => handleThemeChange('')}
-                        />
-                        <label htmlFor="all-themes" className="text-sm">All Themes</label>
-                      </div>
+                    </SelectContent>
+                  </Select>
+                </div>
+                 {/* Theme */}
+                <div className="space-y-2">
+                  <Label>Theme</Label>
+                  <Select onValueChange={handleThemeChange} defaultValue={selectedTheme}>
+                    <SelectTrigger className="bg-transparent text-white">
+                      <SelectValue placeholder="Select a theme" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-starry-darkPurple border-starry-purple">
                       {themes.map((theme) => (
-                        <div key={theme} className="flex items-center space-x-2">
-                          <Checkbox 
-                            id={`theme-${theme}`}
-                            checked={selectedTheme === theme}
-                            onCheckedChange={() => handleThemeChange(theme)}
-                          />
-                          <label htmlFor={`theme-${theme}`} className="text-sm">{theme}</label>
-                        </div>
+                        <SelectItem key={theme} value={theme}>{theme}</SelectItem>
                       ))}
-                    </div>
-                  </div>
-                  
-                  {/* Price Range */}
-                  <div>
-                    <h3 className="font-medium mb-2">Price Range</h3>
-                    <div className="px-2">
-                      <Slider 
-                        defaultValue={[0, 5000]} 
-                        max={5000} 
-                        step={100} 
-                        onValueChange={handlePriceChange}
-                        className="my-6"
-                      />
-                      <div className="flex justify-between text-sm">
-                        <span>₹{priceRange[0]}</span>
-                        <span>₹{priceRange[1]}</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Active Filters */}
-                  <div>
-                    <h3 className="font-medium mb-2">Active Filters</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedCategory && (
-                        <Badge variant="outline" className="bg-gray-700/30">
-                          {selectedCategory}
-                          <button 
-                            className="ml-2" 
-                            onClick={() => setSelectedCategory('')}
-                          >
-                            ×
-                          </button>
-                        </Badge>
-                      )}
-                      {selectedTheme && (
-                        <Badge variant="outline" className="bg-gray-700/30">
-                          {selectedTheme}
-                          <button 
-                            className="ml-2" 
-                            onClick={() => setSelectedTheme('')}
-                          >
-                            ×
-                          </button>
-                        </Badge>
-                      )}
-                      {(priceRange[0] > 0 || priceRange[1] < 5000) && (
-                        <Badge variant="outline" className="bg-gray-700/30">
-                          ₹{priceRange[0]} - ₹{priceRange[1]}
-                          <button 
-                            className="ml-2" 
-                            onClick={() => setPriceRange([0, 5000])}
-                          >
-                            ×
-                          </button>
-                        </Badge>
-                      )}
-                      {(selectedCategory || selectedTheme || priceRange[0] > 0 || priceRange[1] < 5000) && (
-                        <Button 
-                          variant="link" 
-                          size="sm" 
-                          className="px-0 h-auto text-sm text-gray-400 hover:text-white"
-                          onClick={() => {
-                            setSelectedCategory('');
-                            setSelectedTheme('');
-                            setPriceRange([0, 5000]);
-                          }}
-                        >
-                          Clear all
-                        </Button>
-                      )}
-                    </div>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {/* Price Range */}
+                <div className="space-y-2">
+                  <Label>Price Range (₹)</Label>
+                  <Slider
+                    defaultValue={[priceRange.min, priceRange.max]}
+                    min={0}
+                    max={1000}
+                    step={10}
+                    onValueChange={(value) => handlePriceChange(value)}
+                  />
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>₹{priceRange.min}</span>
+                    <span>₹{priceRange.max}</span>
                   </div>
                 </div>
               </CardContent>
+              <CardFooter>
+                <Button className="w-full btn-hero-hover">Apply Filters</Button>
+              </CardFooter>
             </Card>
-          )}
-        </div>
-        
-        {/* Products Grid/List */}
-        <div>
-          {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+          </div>
+
+          {/* Product Listing Section */}
+          <div className="md:w-3/4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold">
+                {searchTerm ? `Search results for "${searchTerm}"` : "All Products"}
+              </h2>
+              <Badge variant="secondary">{products.length} Products</Badge>
             </div>
-          ) : productData?.products?.length === 0 ? (
-            <div className="text-center py-16">
-              <h2 className="text-2xl font-bold mb-2">No products found</h2>
-              <p className="text-gray-400">Try changing your search criteria</p>
-            </div>
-          ) : (
-            <>
-              <div className="mb-4">
-                <p className="text-gray-400">
-                  Showing {productData?.products?.length} of {productData?.total || 0} products
-                </p>
+
+            {isLoading ? (
+              <div className="text-center">Loading products...</div>
+            ) : products.length === 0 ? (
+              <div className="text-center">No products found.</div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
               </div>
-              
-              {viewMode === 'grid' ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {productData?.products?.map((product: Product) => (
-                    <Card key={product.id} className="overflow-hidden bg-gray-800/30 border-gray-700">
-                      <div className="h-56 overflow-hidden relative group">
-                        <img 
-                          src={product.images?.[0] || '/placeholder.svg'} 
-                          alt={product.name}
-                          className="w-full h-full object-cover transition-transform group-hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <div className="flex space-x-2">
-                            <Button 
-                              size="sm" 
-                              className="rounded-full bg-white text-black hover:bg-gray-200"
-                              onClick={() => handleAddToCart(product)}
-                            >
-                              <ShoppingBag size={16} />
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="rounded-full border-white text-white"
-                              onClick={() => handleAddToWishlist(product)}
-                            >
-                              <Heart size={16} />
-                            </Button>
-                          </div>
-                        </div>
-                        {product.featured && (
-                          <Badge className="absolute top-2 left-2 bg-yellow-600">
-                            Featured
-                          </Badge>
-                        )}
-                        {product.discountPrice !== undefined && product.discountPrice < product.price && (
-                          <Badge className="absolute top-2 right-2 bg-red-600">
-                            {Math.round(((product.price - product.discountPrice) / product.price) * 100)}% Off
-                          </Badge>
-                        )}
-                      </div>
-                      <CardContent className="p-4">
-                        <div className="mb-2 flex justify-between items-start">
-                          <div className="flex-1">
-                            <h3 className="font-medium text-lg truncate">{product.name}</h3>
-                            <p className="text-gray-400 text-sm">{product.category}</p>
-                          </div>
-                          <div className="flex items-center">
-                            <Star className="h-4 w-4 fill-yellow-500 text-yellow-500 mr-1" />
-                            <span className="text-sm">{product.rating || 0}</span>
-                          </div>
-                        </div>
-                        <div className="flex justify-between items-center mt-4">
-                          <div>
-                            {product.discountPrice !== undefined && product.discountPrice < product.price ? (
-                              <div className="flex items-center space-x-2">
-                                <span className="text-lg font-bold">₹{product.discountPrice.toFixed(2)}</span>
-                                <span className="text-sm text-gray-400 line-through">₹{product.price.toFixed(2)}</span>
-                              </div>
-                            ) : (
-                              <span className="text-lg font-bold">₹{product.price.toFixed(2)}</span>
-                            )}
-                          </div>
-                          <Badge variant={product.inStock ? "outline" : "destructive"}>
-                            {product.inStock ? "In Stock" : "Out of Stock"}
-                          </Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {productData?.products?.map((product: Product) => (
-                    <Card key={product.id} className="bg-gray-800/30 border-gray-700">
-                      <div className="flex flex-col md:flex-row">
-                        <div className="md:w-1/4 h-40">
-                          <img 
-                            src={product.images?.[0] || '/placeholder.svg'} 
-                            alt={product.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <CardContent className="p-4 flex-1 flex flex-col md:flex-row">
-                          <div className="flex-1">
-                            <h3 className="font-medium text-lg">{product.name}</h3>
-                            <p className="text-gray-400 text-sm mb-2">{product.category}</p>
-                            <p className="text-sm text-gray-300 line-clamp-2 mb-2">{product.description}</p>
-                            <div className="flex items-center space-x-4">
-                              <Badge variant="outline">{product.theme}</Badge>
-                              <div className="flex items-center">
-                                <Star className="h-4 w-4 fill-yellow-500 text-yellow-500 mr-1" />
-                                <span className="text-sm">{product.rating || 0}</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="md:w-1/4 flex flex-col justify-between items-end mt-4 md:mt-0">
-                            <div>
-                              {product.discountPrice !== undefined && product.discountPrice < product.price ? (
-                                <div className="flex items-center space-x-2">
-                                  <span className="text-lg font-bold">₹{product.discountPrice.toFixed(2)}</span>
-                                  <span className="text-sm text-gray-400 line-through">₹{product.price.toFixed(2)}</span>
-                                </div>
-                              ) : (
-                                <span className="text-lg font-bold">₹{product.price.toFixed(2)}</span>
-                              )}
-                            </div>
-                            <div className="flex space-x-2 mt-4">
-                              <Button 
-                                size="sm" 
-                                className="bg-white text-black hover:bg-gray-200"
-                                onClick={() => handleAddToCart(product)}
-                                disabled={!product.inStock}
-                              >
-                                <ShoppingBag size={16} className="mr-2" />
-                                Add to cart
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="border-white text-white"
-                                onClick={() => handleAddToWishlist(product)}
-                              >
-                                <Heart size={16} />
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              )}
-              
-              {/* Pagination controls */}
-              {productData?.pages > 1 && (
-                <div className="mt-8 flex justify-center">
-                  <div className="flex space-x-2">
-                    <Button 
-                      variant="outline" 
-                      className="bg-transparent text-white border-gray-700"
-                      disabled={pageNumber === 1}
-                    >
-                      Previous
-                    </Button>
-                    {/* Page numbers would go here */}
-                    <Button
-                      variant="outline"
-                      className="bg-transparent text-white border-gray-700"
-                      disabled={pageNumber === productData.pages}
-                    >
-                      Next
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
+            )}
+
+            {totalPages > 1 && (
+              <div className="mt-8">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </main>
-      
       <Footer />
     </div>
   );
