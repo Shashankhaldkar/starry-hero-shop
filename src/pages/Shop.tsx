@@ -35,7 +35,9 @@ const Shop = () => {
       keyword, 
       page: pageNumber, 
       category: selectedCategory, 
-      theme: selectedTheme
+      theme: selectedTheme,
+      minPrice: priceRange[0],
+      maxPrice: priceRange[1]
     })
   });
 

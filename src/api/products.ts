@@ -4,7 +4,14 @@ import { Product } from '@/types';
 
 // Get all products with filtering
 export const getProducts = async (
-  keyword = '',
+  keywordOrOptions: string | {
+    keyword?: string;
+    page?: number;
+    category?: string;
+    theme?: string;
+    minPrice?: number;
+    maxPrice?: number;
+  } = '',
   pageNumber = 1,
   category = '',
   theme = '',
@@ -12,9 +19,20 @@ export const getProducts = async (
   maxPrice = 0
 ) => {
   try {
+    // Handle object parameter style
+    if (typeof keywordOrOptions === 'object') {
+      const options = keywordOrOptions;
+      pageNumber = options.page || pageNumber;
+      category = options.category || category;
+      theme = options.theme || theme;
+      minPrice = options.minPrice || minPrice;
+      maxPrice = options.maxPrice || maxPrice;
+      keywordOrOptions = options.keyword || '';
+    }
+
     let url = `/products?pageNumber=${pageNumber}`;
     
-    if (keyword) url += `&keyword=${keyword}`;
+    if (keywordOrOptions) url += `&keyword=${keywordOrOptions}`;
     if (category) url += `&category=${category}`;
     if (theme) url += `&theme=${theme}`;
     if (minPrice > 0) url += `&minPrice=${minPrice}`;
