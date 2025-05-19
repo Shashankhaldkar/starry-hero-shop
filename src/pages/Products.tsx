@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -9,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Filter, Search, ShoppingBag, Heart, Star, ChevronDown, ChevronUp, Grid3X3, List } from "lucide-react";
+import { Filter, Search, ShoppingBag, Heart, Star, Grid3X3, List } from "lucide-react";
 import { categories, themes } from "@/data/products";
 import { toast } from "@/hooks/use-toast";
 
@@ -26,7 +25,14 @@ const Products = () => {
   // Get products with filters
   const { data: productData, isLoading, error } = useQuery({
     queryKey: ["products", keyword, pageNumber, selectedCategory, selectedTheme, priceRange],
-    queryFn: () => getProducts(keyword, pageNumber, selectedCategory, selectedTheme, priceRange[0], priceRange[1])
+    queryFn: () => getProducts({
+      keyword,
+      page: pageNumber,
+      category: selectedCategory,
+      theme: selectedTheme,
+      minPrice: priceRange[0],
+      maxPrice: priceRange[1]
+    })
   });
 
   useEffect(() => {

@@ -1,3 +1,4 @@
+
 import axios from "axios";
 import { API_URL } from "@/config/constants";
 import { Product } from "@/types";
@@ -10,7 +11,7 @@ export const getProducts = async (options: {
   theme?: string;
   minPrice?: number;
   maxPrice?: number;
-}) => {
+} = {}) => {
   const { keyword = "", page = 1, category = "", theme = "", minPrice, maxPrice } = options;
   
   try {
@@ -123,7 +124,7 @@ export const getProductReviews = async (productId: string) => {
     return {
       reviews: [],
       averageRating: 0,
-      numReviews: 0
+      reviewsCount: 0
     };
   }
 };
@@ -172,7 +173,8 @@ export const getMockProducts = (): Product[] => {
       inStock: true,
       featured: true,
       rating: 4.5,
-      numReviews: 12,
+      reviews: [],
+      reviewCount: 12,
       createdAt: "2023-01-15T00:00:00Z"
     },
     {
@@ -193,7 +195,8 @@ export const getMockProducts = (): Product[] => {
       inStock: true,
       featured: true,
       rating: 4.8,
-      numReviews: 24,
+      reviews: [],
+      reviewCount: 24,
       createdAt: "2023-02-10T00:00:00Z"
     },
     {
@@ -213,7 +216,8 @@ export const getMockProducts = (): Product[] => {
       inStock: true,
       featured: false,
       rating: 4.2,
-      numReviews: 8,
+      reviews: [],
+      reviewCount: 8,
       createdAt: "2023-03-05T00:00:00Z"
     },
     {
@@ -234,7 +238,8 @@ export const getMockProducts = (): Product[] => {
       inStock: true,
       featured: true,
       rating: 4.7,
-      numReviews: 15,
+      reviews: [],
+      reviewCount: 15,
       createdAt: "2023-01-25T00:00:00Z"
     },
     {
@@ -254,7 +259,8 @@ export const getMockProducts = (): Product[] => {
       inStock: true,
       featured: false,
       rating: 4.9,
-      numReviews: 32,
+      reviews: [],
+      reviewCount: 32,
       createdAt: "2023-02-28T00:00:00Z"
     },
     {
@@ -274,7 +280,8 @@ export const getMockProducts = (): Product[] => {
       inStock: true,
       featured: true,
       rating: 4.6,
-      numReviews: 18,
+      reviews: [],
+      reviewCount: 18,
       createdAt: "2023-03-15T00:00:00Z"
     },
     {
@@ -294,7 +301,8 @@ export const getMockProducts = (): Product[] => {
       inStock: true,
       featured: false,
       rating: 4.8,
-      numReviews: 22,
+      reviews: [],
+      reviewCount: 22,
       createdAt: "2023-02-05T00:00:00Z"
     },
     {
@@ -314,7 +322,8 @@ export const getMockProducts = (): Product[] => {
       inStock: true,
       featured: true,
       rating: 4.4,
-      numReviews: 16,
+      reviews: [],
+      reviewCount: 16,
       createdAt: "2023-01-10T00:00:00Z"
     }
   ];

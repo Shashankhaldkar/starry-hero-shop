@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Header } from "@/components/Header";
@@ -6,6 +7,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -22,9 +24,37 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Pagination } from "@/components/ui/pagination"
 import { useSearchParams } from 'react-router-dom';
 import * as productAPI from "@/api/products";
+
+// Custom Pagination component that matches the expected props
+const Pagination = ({ 
+  currentPage, 
+  totalPages, 
+  onPageChange 
+}: { 
+  currentPage: number; 
+  totalPages: number; 
+  onPageChange: (page: number) => void; 
+}) => {
+  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  
+  return (
+    <div className="flex justify-center space-x-2">
+      {pages.map(page => (
+        <Button
+          key={page}
+          variant={page === currentPage ? "default" : "outline"}
+          size="sm"
+          className={page === currentPage ? "bg-starry-purple" : ""}
+          onClick={() => onPageChange(page)}
+        >
+          {page}
+        </Button>
+      ))}
+    </div>
+  );
+};
 
 const Shop = () => {
   const navigate = useNavigate();

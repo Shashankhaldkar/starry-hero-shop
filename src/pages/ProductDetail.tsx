@@ -1,8 +1,7 @@
-
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { useQuery } from '@tanstack/react-query';
-import { getProductById, createProductReview } from '@/api/products';
+import { getProductById, getRelatedProducts, getProductReviews, addProductReview } from '@/api/products';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -48,6 +47,20 @@ const ProductDetail = () => {
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
     queryFn: () => getProductById(id as string),
+    enabled: !!id
+  });
+
+  // Fetch related products
+  const { data: relatedProducts } = useQuery({
+    queryKey: ['related-products', id],
+    queryFn: () => getRelatedProducts(id as string),
+    enabled: !!id
+  });
+
+  // Fetch product reviews
+  const { data: productReviews } = useQuery({
+    queryKey: ['product-reviews', id],
+    queryFn: () => getProductReviews(id as string),
     enabled: !!id
   });
 
@@ -102,7 +115,7 @@ const ProductDetail = () => {
     if (!id) return;
 
     try {
-      await createProductReview(id, {
+      await addProductReview(id, {
         rating: reviewRating,
         comment: data.comment
       });
@@ -651,7 +664,31 @@ const ProductDetail = () => {
           </Tabs>
         </div>
         
-        {/* Related products section could be added here */}
+        {/* Related products section */}
+        <div className="mt-12">
+          <h3 className="text-xl font-bold mb-4">Related Products</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {relatedProducts && relatedProducts.length > 0 ? (
+              relatedProducts.map((product) => (
+                <div key={product.id} className="bg-starry-charcoal/30 p-4 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xl font-bold mb-2">{product.name}</h4>
+                    <span className="text-starry-neutral">${product.price.toFixed(2)}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <img 
+                      src={product.images[0]} 
+                      alt={product.name}
+                      className="w-24 h-24 object-cover rounded-lg"
+                    />
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-starry-neutral">No related products found.</p>
+            )}
+          </div>
+        </div>
       </main>
       <Footer />
     </div>

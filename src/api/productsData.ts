@@ -35,7 +35,7 @@ export const getProductThemes = async (): Promise<Theme[]> => {
 // Helper function to get all products
 export const getAllProducts = async (): Promise<Product[]> => {
   try {
-    const response = await productAPI.getProducts();
+    const response = await productAPI.getProducts({});
     return response.products.map(product => ({
       ...product,
       id: product._id // Map _id to id for consistency with our types
@@ -49,7 +49,14 @@ export const getAllProducts = async (): Promise<Product[]> => {
 // Helper function to get featured products
 export const getFeaturedProducts = async (): Promise<Product[]> => {
   try {
-    const response = await productAPI.getProducts("", 1, "", "", 0, 0);
+    const response = await productAPI.getProducts({
+      keyword: "",
+      page: 1,
+      category: "",
+      theme: "",
+      minPrice: 0,
+      maxPrice: 0
+    });
     return response.products
       .filter(product => product.featured)
       .slice(0, 8)
@@ -66,7 +73,10 @@ export const getFeaturedProducts = async (): Promise<Product[]> => {
 // Helper function to get products by category
 export const getProductsByCategory = async (categoryId: string): Promise<Product[]> => {
   try {
-    const response = await productAPI.getProducts("", 1, categoryId);
+    const response = await productAPI.getProducts({
+      category: categoryId,
+      page: 1
+    });
     return response.products.map(product => ({
       ...product,
       id: product._id
@@ -80,7 +90,10 @@ export const getProductsByCategory = async (categoryId: string): Promise<Product
 // Helper function to get products by theme
 export const getProductsByTheme = async (themeId: string): Promise<Product[]> => {
   try {
-    const response = await productAPI.getProducts("", 1, "", themeId);
+    const response = await productAPI.getProducts({
+      theme: themeId,
+      page: 1
+    });
     return response.products.map(product => ({
       ...product,
       id: product._id
@@ -94,7 +107,7 @@ export const getProductsByTheme = async (themeId: string): Promise<Product[]> =>
 // Helper function to get new arrivals (most recently added products)
 export const getNewArrivals = async (): Promise<Product[]> => {
   try {
-    const response = await productAPI.getProducts();
+    const response = await productAPI.getProducts({});
     return response.products
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 8)
@@ -111,7 +124,7 @@ export const getNewArrivals = async (): Promise<Product[]> => {
 // Helper function to get popular products (highest rated or most sold)
 export const getPopularProducts = async (): Promise<Product[]> => {
   try {
-    const response = await productAPI.getProducts();
+    const response = await productAPI.getProducts({});
     return response.products
       .sort((a, b) => (b.rating || 0) - (a.rating || 0))
       .slice(0, 8)
