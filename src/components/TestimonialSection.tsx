@@ -41,13 +41,13 @@ export function TestimonialSection() {
   return (
     <section className="py-16 bg-gradient-to-b from-starry-charcoal to-starry-darkPurple">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-2 text-white">Heroes Love Our Tees</h2>
-        <p className="text-starry-neutral text-center mb-12">What our customers are saying</p>
-        
+        <h2 className="text-3xl font-bold text-center mb-2 text-black">Heroes Love Our Tees</h2>
+        <p className="text-black text-center mb-12">What our customers are saying</p>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((testimonial) => (
-            <div 
-              key={testimonial.id} 
+            <div
+              key={testimonial.id}
               className="bg-gradient-to-b from-starry-darkPurple/60 to-starry-darkPurple/40 backdrop-blur-sm p-6 rounded-xl border border-starry-purple/10 hover:border-starry-purple/30 transition-all duration-300"
             >
               {/* Rating */}
@@ -55,27 +55,24 @@ export function TestimonialSection() {
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`w-4 h-4 ${
-                      i < testimonial.rating
-                        ? "text-starry-orange fill-starry-orange"
-                        : "text-gray-400"
-                    }`}
+                    className={`w-4 h-4 ${i < testimonial.rating ? "text-black" : "text-gray-400"
+                      }`}
                   />
                 ))}
               </div>
-              
+
               {/* Testimonial text */}
-              <p className="text-starry-softPurple mb-6 italic">"{testimonial.comment}"</p>
-              
+              <p className="text-black mb-6 italic">"{testimonial.comment}"</p>
+
               {/* Customer info */}
               <div className="flex items-center">
-                <img 
-                  src={testimonial.avatar} 
+                <img
+                  src={testimonial.avatar}
                   alt={testimonial.name}
                   className="w-12 h-12 rounded-full mr-4"
                 />
                 <div>
-                  <p className="text-white font-medium">{testimonial.name}</p>
+                  <p className="text-black font-medium">{testimonial.name}</p>
                   <p className="text-xs text-starry-neutral">on {testimonial.product}</p>
                 </div>
               </div>

@@ -19,9 +19,9 @@ export function FeaturedProducts() {
   return (
     <section className="py-16 bg-starry-charcoal">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-2 text-white">Featured T-Shirts</h2>
-        <p className="text-starry-neutral text-center mb-10">Exclusive designs our heroes would wear</p>
-        
+        <h2 className="text-3xl font-bold text-center mb-2 text-black">Featured T-Shirts</h2>
+        <p className="text-black text-center mb-10">Exclusive designs our heroes would wear</p>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {featuredProducts.map((product) => (
             <div 
@@ -90,15 +90,15 @@ export function FeaturedProducts() {
                     {product.discountPrice ? (
                       <>
                         <span className="text-lg font-bold text-white">${product.discountPrice.toFixed(2)}</span>
-                        <span className="text-sm text-starry-neutral line-through">${product.price.toFixed(2)}</span>
+                        <span className="text-sm text-black line-through">${product.price.toFixed(2)}</span>
                       </>
                     ) : (
-                      <span className="text-lg font-bold text-white">${product.price.toFixed(2)}</span>
+                      <span className="text-lg font-bold text-black">${product.price.toFixed(2)}</span>
                     )}
                   </div>
                   <Button 
                     variant="ghost"
-                    className="text-starry-purple border border-starry-purple/20 hover:bg-starry-purple/10 hover:text-starry-vividPurple"
+                    className="text-black border border-black/20 hover:bg-black/10 hover:text-black"
                   >
                     Add to Cart
                   </Button>
@@ -110,9 +110,9 @@ export function FeaturedProducts() {
         
         {/* View all button */}
         <div className="text-center mt-12">
-          <Button 
-            size="lg" 
-            className="bg-starry-purple hover:bg-starry-vividPurple text-white font-medium px-8"
+          <Button
+            size="lg"
+            className="bg-black/0 hover:bg-black/20 text-black font-medium px-8"
           >
             View All Products
           </Button>
