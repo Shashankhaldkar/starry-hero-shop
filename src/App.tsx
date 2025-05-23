@@ -12,6 +12,7 @@ import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
 import About from "./pages/About";
+import { ScrollProgress } from "@/components/ui/progress-indicator";
 
 import Shop from "./pages/Shop";
 import Collections from "./pages/Collections";
@@ -27,7 +28,14 @@ const ProtectedRoutes = () => {
   const { user, isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return <div className="flex justify-center items-center min-h-screen text-xl">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-indigo-950 to-purple-900 text-xl">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="w-20 h-20 border-4 border-t-purple-500 border-r-indigo-500 border-b-blue-500 border-l-transparent rounded-full animate-spin-slow mb-4"></div>
+          <p className="text-white">Loading your superhero profile...</p>
+        </div>
+      </div>
+    );
   }
 
   // If user is not authenticated, show login modal
@@ -35,7 +43,7 @@ const ProtectedRoutes = () => {
     return (
       <>
         <LoginRegisterModal open={true} />
-        <div className="fixed inset-0 bg-starry-darkPurple/90 backdrop-blur-sm z-30" />
+        <div className="fixed inset-0 bg-indigo-950/90 backdrop-blur-sm z-30" />
       </>
     );
   }
@@ -46,6 +54,7 @@ const ProtectedRoutes = () => {
       <>
         <Toaster />
         <Sonner />
+        <ScrollProgress className="bg-transparent" />
         <CartProvider>
           <BrowserRouter>
             <Routes>
@@ -67,6 +76,7 @@ const ProtectedRoutes = () => {
     <>
       <Toaster />
       <Sonner />
+      <ScrollProgress className="bg-transparent" />
       <CartProvider>
         <BrowserRouter>
           <Routes>

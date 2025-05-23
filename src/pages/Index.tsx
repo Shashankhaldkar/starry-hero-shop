@@ -7,10 +7,18 @@ import { ThemeSection } from '@/components/ThemeSection';
 import { TestimonialSection } from '@/components/TestimonialSection';
 import { Newsletter } from '@/components/Newsletter';
 import { Footer } from '@/components/Footer';
+import { Toaster } from 'sonner';
+import { useEffect } from 'react';
 
 const Index = () => {
+  useEffect(() => {
+    // Scroll to top on page load
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-starry-darkPurple text-white">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-950 to-purple-900 text-white">
+      <Toaster position="top-right" />
       <Header />
       <main>
         <Hero />
