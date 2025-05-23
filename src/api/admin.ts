@@ -1,4 +1,3 @@
-
 import API from './index';
 import { Product } from '@/types';
 
@@ -16,12 +15,12 @@ export const getAdminProducts = async () => {
 // Create a new product
 export const createProduct = async (productData: FormData) => {
   try {
-    console.log('Creating product with data:', Object.fromEntries(productData));
     const { data } = await API.post('/products', productData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+        'Content-Type': 'multipart/form-data'
+      }
     });
+    console.log('Created product response:', data);
     return data;
   } catch (error) {
     console.error('Error creating product:', error);
@@ -32,12 +31,12 @@ export const createProduct = async (productData: FormData) => {
 // Update a product
 export const updateProduct = async (id: string, productData: FormData) => {
   try {
-    console.log('Updating product with data:', Object.fromEntries(productData));
     const { data } = await API.put(`/products/${id}`, productData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+        'Content-Type': 'multipart/form-data'
+      }
     });
+    console.log('Updated product response:', data);
     return data;
   } catch (error) {
     console.error('Error updating product:', error);

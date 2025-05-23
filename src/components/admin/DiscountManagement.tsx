@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { 
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
 } from "@/components/ui/table";
@@ -15,74 +16,107 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Plus, Edit, Trash2, Calendar as CalendarIcon, Percent, Tag, Ticket } from "lucide-react";
+import { Plus, Edit, Trash2, Calendar as CalendarIcon, Percent, Tag, Ticket, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import * as adminAPI from "@/api/admin";
+import { toast } from "sonner";
 
-const sampleCoupons = [
-  {
-    id: "COUPON-001",
-    code: "SUMMER25",
-    type: "percentage",
-    amount: 25,
-    minimumPurchase: 50,
-    usageCount: 145,
-    startDate: "2023-06-01",
-    endDate: "2023-08-31",
-    isActive: true
-  },
-  {
-    id: "COUPON-002",
-    code: "FREESHIP",
-    type: "fixed",
-    amount: 10,
-    minimumPurchase: 75,
-    usageCount: 89,
-    startDate: "2023-04-15",
-    endDate: "2023-05-15",
-    isActive: true
-  },
-  {
-    id: "COUPON-003",
-    code: "WELCOME10",
-    type: "percentage",
-    amount: 10,
-    minimumPurchase: 0,
-    usageCount: 210,
-    startDate: "2023-01-01",
-    endDate: "2023-12-31",
-    isActive: true
-  },
-  {
-    id: "COUPON-004",
-    code: "FLASH50",
-    type: "percentage",
-    amount: 50,
-    minimumPurchase: 150,
-    usageCount: 32,
-    startDate: "2023-04-10",
-    endDate: "2023-04-12",
-    isActive: false
-  }
-];
+interface Coupon {
+  id: string;
+  code: string;
+  type: string;
+  amount: number;
+  minimumPurchase: number;
+  usageCount: number;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+}
 
 export const DiscountManagement = () => {
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddCouponOpen, setIsAddCouponOpen] = useState(false);
   const [isEditCouponOpen, setIsEditCouponOpen] = useState(false);
   const [isDeleteCouponOpen, setIsDeleteCouponOpen] = useState(false);
-  const [selectedCoupon, setSelectedCoupon] = useState<any>(null);
+  const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [couponForm, setCouponForm] = useState({
     code: "",
-    type: "percentage",
-    amount: 0,
+    description: "",
+    discountType: "percentage", // Changed from 'type' to match backend
+    discountAmount: 0, // Changed from 'amount' to match backend
     minimumPurchase: 0,
     startDate: new Date(),
     endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    usageLimit: 0,
     isActive: true
+  });
+
+  // Fetch coupons data
+  const { data: couponsData, isLoading: couponsLoading } = useQuery({
+    queryKey: ['coupons'],
+    queryFn: adminAPI.getCoupons,
+    onError: (error) => {
+      console.error("Error fetching coupons:", error);
+      uiToast({
+        title: "Error",
+        description: "Failed to load coupons. Using sample data.",
+      });
+    }
+  });
+
+  // Create coupon mutation
+  const createCouponMutation = useMutation({
+    mutationFn: adminAPI.createCoupon,
+    onSuccess: () => {
+      toast.success("Coupon created successfully");
+      setIsAddCouponOpen(false);
+      resetForm();
+      queryClient.invalidateQueries({ queryKey: ['coupons'] });
+      setIsSubmitting(false);
+    },
+    onError: (error) => {
+      console.error("Error creating coupon:", error);
+      toast.error("Failed to create coupon");
+      setIsSubmitting(false);
+    }
+  });
+
+  // Update coupon mutation
+  const updateCouponMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string, data: any }) => adminAPI.updateCoupon(id, data),
+    onSuccess: () => {
+      toast.success("Coupon updated successfully");
+      setIsEditCouponOpen(false);
+      resetForm();
+      queryClient.invalidateQueries({ queryKey: ['coupons'] });
+      setIsSubmitting(false);
+    },
+    onError: (error) => {
+      console.error("Error updating coupon:", error);
+      toast.error("Failed to update coupon");
+      setIsSubmitting(false);
+    }
+  });
+
+  // Delete coupon mutation
+  const deleteCouponMutation = useMutation({
+    mutationFn: adminAPI.deleteCoupon,
+    onSuccess: () => {
+      toast.success("Coupon deleted successfully");
+      setIsDeleteCouponOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['coupons'] });
+    },
+    onError: (error) => {
+      console.error("Error deleting coupon:", error);
+      toast.error("Failed to delete coupon");
+    }
   });
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,7 +127,10 @@ export const DiscountManagement = () => {
     setSelectedStatus(value);
   };
 
-  const filteredCoupons = sampleCoupons.filter(coupon => {
+  // Use either API data or fallback to sample data
+  const coupons = couponsData || sampleCoupons;
+
+  const filteredCoupons = coupons.filter((coupon: Coupon) => {
     const matchesSearch = coupon.code.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = 
@@ -132,59 +169,80 @@ export const DiscountManagement = () => {
   const resetForm = () => {
     setCouponForm({
       code: "",
-      type: "percentage",
-      amount: 0,
+      description: "",
+      discountType: "percentage",
+      discountAmount: 0,
       minimumPurchase: 0,
       startDate: new Date(),
       endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      usageLimit: 0,
       isActive: true
     });
   };
 
-  const editCoupon = (coupon: any) => {
+  const editCoupon = (coupon: Coupon) => {
     setSelectedCoupon(coupon);
     setCouponForm({
       code: coupon.code,
-      type: coupon.type,
-      amount: coupon.amount,
+      description: coupon.description || "",
+      discountType: coupon.type,
+      discountAmount: coupon.amount,
       minimumPurchase: coupon.minimumPurchase,
       startDate: new Date(coupon.startDate),
       endDate: new Date(coupon.endDate),
+      usageLimit: coupon.usageLimit || 0,
       isActive: coupon.isActive
     });
     setIsEditCouponOpen(true);
   };
 
-  const confirmDelete = (coupon: any) => {
+  const confirmDelete = (coupon: Coupon) => {
     setSelectedCoupon(coupon);
     setIsDeleteCouponOpen(true);
   };
 
   const handleAddCoupon = () => {
-    toast({
-      title: "Coupon Added",
-      description: `Coupon ${couponForm.code} has been created successfully.`,
-    });
-    setIsAddCouponOpen(false);
-    resetForm();
+    if (!validateCouponForm()) return;
+    
+    setIsSubmitting(true);
+    createCouponMutation.mutate(couponForm);
   };
 
   const handleUpdateCoupon = () => {
-    toast({
-      title: "Coupon Updated",
-      description: `Coupon ${couponForm.code} has been updated successfully.`,
-    });
-    setIsEditCouponOpen(false);
-    resetForm();
+    if (!selectedCoupon || !validateCouponForm()) return;
+    
+    setIsSubmitting(true);
+    updateCouponMutation.mutate({ id: selectedCoupon.id, data: couponForm });
   };
 
   const handleDeleteCoupon = () => {
-    toast({
-      title: "Coupon Deleted",
-      description: `Coupon ${selectedCoupon?.code} has been deleted.`,
-    });
-    setIsDeleteCouponOpen(false);
-    setSelectedCoupon(null);
+    if (!selectedCoupon) return;
+    
+    deleteCouponMutation.mutate(selectedCoupon.id);
+  };
+
+  const validateCouponForm = () => {
+    if (!couponForm.code) {
+      toast.error("Please enter a coupon code");
+      return false;
+    }
+    
+    if (couponForm.discountAmount <= 0) {
+      toast.error("Discount amount must be greater than zero");
+      return false;
+    }
+    
+    if (couponForm.discountType === 'percentage' && couponForm.discountAmount > 100) {
+      toast.error("Percentage discount cannot exceed 100%");
+      return false;
+    }
+    
+    if (couponForm.endDate < couponForm.startDate) {
+      toast.error("End date cannot be earlier than start date");
+      return false;
+    }
+    
+    return true;
   };
 
   const CouponFormContent = () => (
@@ -203,10 +261,10 @@ export const DiscountManagement = () => {
         </div>
         
         <div>
-          <Label htmlFor="type">Discount Type</Label>
+          <Label htmlFor="discountType">Discount Type</Label>
           <RadioGroup
-            value={couponForm.type}
-            onValueChange={(value) => handleSelectChange("type", value)}
+            value={couponForm.discountType}
+            onValueChange={(value) => handleSelectChange("discountType", value)}
             className="flex flex-col space-y-1 mt-2"
           >
             <div className="flex items-center space-x-2">
@@ -225,16 +283,16 @@ export const DiscountManagement = () => {
         </div>
         
         <div>
-          <Label htmlFor="amount">
-            {couponForm.type === "percentage" ? "Discount Percentage (%)" : "Discount Amount ($)"}
+          <Label htmlFor="discountAmount">
+            {couponForm.discountType === "percentage" ? "Discount Percentage (%)" : "Discount Amount ($)"}
           </Label>
           <Input 
-            id="amount" 
-            name="amount" 
+            id="discountAmount" 
+            name="discountAmount" 
             type="number" 
-            value={couponForm.amount} 
+            value={couponForm.discountAmount} 
             onChange={handleInputChange} 
-            placeholder={couponForm.type === "percentage" ? "25" : "10"} 
+            placeholder={couponForm.discountType === "percentage" ? "25" : "10"} 
           />
         </div>
         
@@ -295,6 +353,29 @@ export const DiscountManagement = () => {
             </PopoverContent>
           </Popover>
         </div>
+        
+        <div>
+          <Label htmlFor="description">Description (optional)</Label>
+          <Input 
+            id="description" 
+            name="description" 
+            value={couponForm.description} 
+            onChange={handleInputChange} 
+            placeholder="Summer sale discount" 
+          />
+        </div>
+        
+        <div>
+          <Label htmlFor="usageLimit">Usage Limit (0 for unlimited)</Label>
+          <Input 
+            id="usageLimit" 
+            name="usageLimit" 
+            type="number" 
+            value={couponForm.usageLimit} 
+            onChange={handleInputChange} 
+            placeholder="100" 
+          />
+        </div>
       </div>
 
       <div className="flex items-center space-x-2">
@@ -328,7 +409,18 @@ export const DiscountManagement = () => {
             <CouponFormContent />
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsAddCouponOpen(false)}>Cancel</Button>
-              <Button className="btn-hero-hover" onClick={handleAddCoupon}>Create Coupon</Button>
+              <Button 
+                className="btn-hero-hover" 
+                onClick={handleAddCoupon}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : "Create Coupon"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -369,12 +461,21 @@ export const DiscountManagement = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredCoupons.length === 0 ? (
+              {couponsLoading ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8">
+                    <div className="flex justify-center items-center">
+                      <Loader2 className="h-6 w-6 animate-spin text-purple-500 mr-2" />
+                      <span>Loading coupons...</span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : filteredCoupons.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={8} className="text-center">No coupons found</TableCell>
                 </TableRow>
               ) : (
-                filteredCoupons.map((coupon) => (
+                filteredCoupons.map((coupon: Coupon) => (
                   <TableRow key={coupon.id} className="hover:bg-starry-darkPurple/60">
                     <TableCell className="font-medium">{coupon.code}</TableCell>
                     <TableCell>
@@ -441,7 +542,18 @@ export const DiscountManagement = () => {
           <CouponFormContent />
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditCouponOpen(false)}>Cancel</Button>
-            <Button className="btn-hero-hover" onClick={handleUpdateCoupon}>Update Coupon</Button>
+            <Button 
+              className="btn-hero-hover" 
+              onClick={handleUpdateCoupon}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : "Update Coupon"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -456,10 +568,69 @@ export const DiscountManagement = () => {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleteCouponOpen(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleDeleteCoupon}>Delete</Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleDeleteCoupon}
+              disabled={deleteCouponMutation.isPending}
+            >
+              {deleteCouponMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : "Delete"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
   );
 };
+
+// Sample data as fallback if API fails
+const sampleCoupons = [
+  {
+    id: "COUPON-001",
+    code: "SUMMER25",
+    type: "percentage",
+    amount: 25,
+    minimumPurchase: 50,
+    usageCount: 145,
+    startDate: "2023-06-01",
+    endDate: "2023-08-31",
+    isActive: true
+  },
+  {
+    id: "COUPON-002",
+    code: "FREESHIP",
+    type: "fixed",
+    amount: 10,
+    minimumPurchase: 75,
+    usageCount: 89,
+    startDate: "2023-04-15",
+    endDate: "2023-05-15",
+    isActive: true
+  },
+  {
+    id: "COUPON-003",
+    code: "WELCOME10",
+    type: "percentage",
+    amount: 10,
+    minimumPurchase: 0,
+    usageCount: 210,
+    startDate: "2023-01-01",
+    endDate: "2023-12-31",
+    isActive: true
+  },
+  {
+    id: "COUPON-004",
+    code: "FLASH50",
+    type: "percentage",
+    amount: 50,
+    minimumPurchase: 150,
+    usageCount: 32,
+    startDate: "2023-04-10",
+    endDate: "2023-04-12",
+    isActive: false
+  }
+];
