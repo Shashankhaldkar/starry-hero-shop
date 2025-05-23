@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -67,39 +66,39 @@ export const ProductList = ({ products, isLoading, onEditProduct, onDeleteProduc
 
   if (isLoading) {
     return (
-      <Card className="bg-dark-900 border-dark-700 p-6">
-        <div className="text-center p-8 text-dark-300">Loading products...</div>
+      <Card className="bg-indigo-900/50 border-purple-700/30 p-6">
+        <div className="text-center p-8 text-purple-200">Loading products...</div>
       </Card>
     );
   }
 
   if (!products || products.length === 0) {
     return (
-      <Card className="bg-dark-900 border-dark-700 p-6">
-        <div className="text-center p-8 text-dark-300">No products found. Add a new product to get started.</div>
+      <Card className="bg-indigo-900/50 border-purple-700/30 p-6">
+        <div className="text-center p-8 text-purple-200">No products found. Add a new product to get started.</div>
       </Card>
     );
   }
 
   return (
     <>
-      <Card className="bg-dark-900 border-dark-700">
+      <Card className="bg-indigo-900/50 border-purple-700/30">
         <ScrollArea className="h-[500px] rounded-md">
           <Table>
             <TableHeader>
-              <TableRow className="hover:bg-dark-900 border-dark-700">
-                <TableHead className="w-[80px]">Image</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Theme</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+              <TableRow className="hover:bg-indigo-800/50 border-purple-700/30">
+                <TableHead className="w-[80px] text-purple-200">Image</TableHead>
+                <TableHead className="text-purple-200">Name</TableHead>
+                <TableHead className="text-purple-200">Category</TableHead>
+                <TableHead className="text-purple-200">Theme</TableHead>
+                <TableHead className="text-purple-200">Price</TableHead>
+                <TableHead className="text-purple-200">Stock</TableHead>
+                <TableHead className="text-right text-purple-200">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {products.map((product) => (
-                <TableRow key={product.id} className="hover:bg-dark-800/60 border-dark-800">
+                <TableRow key={product.id} className="hover:bg-indigo-800/40 border-purple-700/20">
                   <TableCell>
                     <div className="h-12 w-12 rounded-md overflow-hidden bg-dark-800">
                       {product.images && product.images.length > 0 ? (
@@ -176,7 +175,7 @@ export const ProductList = ({ products, isLoading, onEditProduct, onDeleteProduc
 
       {/* View Product Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="bg-dark-900 border-dark-700 text-white max-w-3xl">
+        <DialogContent className="bg-indigo-900 border-purple-700/30 text-white max-w-3xl">
           <DialogHeader>
             <DialogTitle>Product Details</DialogTitle>
           </DialogHeader>
@@ -259,10 +258,10 @@ export const ProductList = ({ products, isLoading, onEditProduct, onDeleteProduc
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="bg-dark-900 border-dark-700 text-white">
+        <DialogContent className="bg-indigo-900 border-purple-700/30 text-white">
           <DialogHeader>
             <DialogTitle>Confirm Deletion</DialogTitle>
-            <DialogDescription className="text-dark-400">
+            <DialogDescription className="text-purple-300">
               Are you sure you want to delete "{deleteProduct?.name}"? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
@@ -270,7 +269,7 @@ export const ProductList = ({ products, isLoading, onEditProduct, onDeleteProduc
             <Button 
               variant="outline" 
               onClick={() => setIsDeleteDialogOpen(false)}
-              className="bg-dark-800 hover:bg-dark-700 border-dark-700"
+              className="bg-indigo-800 hover:bg-indigo-700 border-purple-700/30 text-white"
               disabled={isDeleting}
             >
               Cancel
@@ -279,6 +278,7 @@ export const ProductList = ({ products, isLoading, onEditProduct, onDeleteProduc
               variant="destructive" 
               onClick={handleDelete}
               disabled={isDeleting}
+              className="bg-red-700 hover:bg-red-800"
             >
               {isDeleting ? "Deleting..." : "Delete"}
             </Button>

@@ -1,11 +1,9 @@
-
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useQuery } from "@tanstack/react-query";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line } from "recharts";
-import { ChartContainer } from "@/components/ui/chart";
 import * as adminAPI from "@/api/admin";
 import { toast } from "@/components/ui/use-toast";
 import { Product } from "@/types";
@@ -84,10 +82,10 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
   // Show loading state
   if (isLoading || analyticsLoading) {
     return (
-      <Card className="bg-admin-darkGrey/80 border-admin-grey/30">
+      <Card className="bg-indigo-900/50 border-purple-700/30">
         <CardContent className="p-6">
           <div className="flex items-center justify-center h-64">
-            <p className="text-admin-softGrey">Loading analytics data...</p>
+            <p className="text-purple-200">Loading analytics data...</p>
           </div>
         </CardContent>
       </Card>
@@ -96,14 +94,14 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
 
   return (
     <div className="space-y-6">
-      <Card className="bg-admin-darkGrey/80 border-admin-grey/30">
+      <Card className="bg-indigo-900/50 border-purple-700/30">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <Label htmlFor="product-select" className="text-admin-softGrey">Select Product</Label>
+              <Label htmlFor="product-select" className="text-purple-200">Select Product</Label>
               <select
                 id="product-select"
-                className="w-full p-2 mt-1 bg-admin-darkGrey border border-admin-grey/30 rounded-md text-white"
+                className="w-full p-2 mt-1 bg-indigo-800/70 border border-purple-700/30 rounded-md text-white"
                 value={productId}
                 onChange={handleProductChange}
               >
@@ -117,36 +115,36 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
             </div>
             
             <div>
-              <Label className="text-admin-softGrey">Time Range</Label>
+              <Label className="text-purple-200">Time Range</Label>
               <RadioGroup 
                 value={timeRange} 
                 onValueChange={handleTimeRangeChange} 
                 className="flex flex-wrap gap-4 mt-2"
               >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="30days" id="r1" />
-                  <Label htmlFor="r1" className="text-admin-softGrey">30 Days</Label>
+                  <RadioGroupItem value="30days" id="r1" className="text-purple-300 border-purple-400" />
+                  <Label htmlFor="r1" className="text-purple-200">30 Days</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="3months" id="r2" />
-                  <Label htmlFor="r2" className="text-admin-softGrey">3 Months</Label>
+                  <RadioGroupItem value="3months" id="r2" className="text-purple-300 border-purple-400" />
+                  <Label htmlFor="r2" className="text-purple-200">3 Months</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="6months" id="r3" />
-                  <Label htmlFor="r3" className="text-admin-softGrey">6 Months</Label>
+                  <RadioGroupItem value="6months" id="r3" className="text-purple-300 border-purple-400" />
+                  <Label htmlFor="r3" className="text-purple-200">6 Months</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="1year" id="r4" />
-                  <Label htmlFor="r4" className="text-admin-softGrey">1 Year</Label>
+                  <RadioGroupItem value="1year" id="r4" className="text-purple-300 border-purple-400" />
+                  <Label htmlFor="r4" className="text-purple-200">1 Year</Label>
                 </div>
               </RadioGroup>
             </div>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-            <Card className="bg-admin-darkGrey border-admin-grey/20">
+            <Card className="bg-indigo-800/50 border-purple-700/30">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-admin-softGrey">Total Sales</CardTitle>
+                <CardTitle className="text-sm font-medium text-purple-200">Total Sales</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-white">
@@ -155,9 +153,9 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
               </CardContent>
             </Card>
             
-            <Card className="bg-admin-darkGrey border-admin-grey/20">
+            <Card className="bg-indigo-800/50 border-purple-700/30">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-admin-softGrey">Total Revenue</CardTitle>
+                <CardTitle className="text-sm font-medium text-purple-200">Total Revenue</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-white">
@@ -166,9 +164,9 @@ export const ProductAnalytics = ({ productsData, isLoading }: ProductAnalyticsPr
               </CardContent>
             </Card>
             
-            <Card className="bg-admin-darkGrey border-admin-grey/20">
+            <Card className="bg-indigo-800/50 border-purple-700/30">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-admin-softGrey">Avg. Rating</CardTitle>
+                <CardTitle className="text-sm font-medium text-purple-200">Avg. Rating</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-white">

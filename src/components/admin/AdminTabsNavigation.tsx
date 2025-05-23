@@ -3,7 +3,7 @@ import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface AdminTabsNavigationProps {
   activeTab: string;
-  setActiveTab: (tab: string) => void;
+  setActiveTab: (value: string) => void;
 }
 
 export const AdminTabsNavigation = ({ 
@@ -11,32 +11,39 @@ export const AdminTabsNavigation = ({
   setActiveTab 
 }: AdminTabsNavigationProps) => {
   return (
-    <TabsList className="bg-admin-darkGrey border border-admin-grey/30 p-1 rounded-lg mb-8 grid grid-cols-4">
+    <TabsList className="bg-indigo-900/40 border border-purple-700/30 rounded-lg p-1 mb-6">
       <TabsTrigger 
         value="products" 
-        className="text-admin-white data-[state=active]:bg-admin-black"
         onClick={() => setActiveTab("products")}
+        className="data-[state=active]:bg-purple-700 text-white"
       >
         Products
       </TabsTrigger>
       <TabsTrigger 
+        value="analytics" 
+        onClick={() => setActiveTab("analytics")}
+        className="data-[state=active]:bg-purple-700 text-white"
+      >
+        Analytics
+      </TabsTrigger>
+      <TabsTrigger 
         value="orders" 
-        className="text-admin-white data-[state=active]:bg-admin-black"
         onClick={() => setActiveTab("orders")}
+        className="data-[state=active]:bg-purple-700 text-white"
       >
         Orders
       </TabsTrigger>
       <TabsTrigger 
         value="users" 
-        className="text-admin-white data-[state=active]:bg-admin-black"
         onClick={() => setActiveTab("users")}
+        className="data-[state=active]:bg-purple-700 text-white"
       >
         Users
       </TabsTrigger>
       <TabsTrigger 
         value="discounts" 
-        className="text-admin-white data-[state=active]:bg-admin-black"
         onClick={() => setActiveTab("discounts")}
+        className="data-[state=active]:bg-purple-700 text-white"
       >
         Discounts
       </TabsTrigger>

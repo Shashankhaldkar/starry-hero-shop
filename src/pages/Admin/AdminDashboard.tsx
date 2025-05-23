@@ -11,6 +11,7 @@ import AdminProductAnalytics from "@/components/admin/AdminProductAnalytics";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { AdminTabsNavigation } from "@/components/admin/AdminTabsNavigation";
 import { Toaster } from "sonner";
+import { ScrollProgress } from "@/components/ui/progress-indicator";
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -34,8 +35,9 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-admin-black text-admin-white">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-950 to-purple-900 text-white">
       <Toaster position="top-right" />
+      <ScrollProgress />
       <AdminHeader handleLogout={handleLogout} />
       
       {/* Main Content */}
