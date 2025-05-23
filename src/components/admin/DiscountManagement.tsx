@@ -485,9 +485,9 @@ export const DiscountManagement = () => {
                     <TableCell>{coupon.usageCount}</TableCell>
                     <TableCell>
                       <div className="text-xs">
-                        <div>{coupon.startDate}</div>
+                        <div>{typeof coupon.startDate === 'string' ? coupon.startDate : format(coupon.startDate, 'yyyy-MM-dd')}</div>
                         <div>to</div>
-                        <div>{coupon.endDate}</div>
+                        <div>{typeof coupon.endDate === 'string' ? coupon.endDate : format(coupon.endDate, 'yyyy-MM-dd')}</div>
                       </div>
                     </TableCell>
                     <TableCell>
