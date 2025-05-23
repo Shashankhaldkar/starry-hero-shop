@@ -35,17 +35,17 @@ export const ScrollProgress = ({ className }: ScrollProgressProps) => {
   );
 };
 
-interface ProgressProps {
+interface CustomProgressProps {
   value: number;
   className?: string;
   indicatorClassName?: string;
 }
 
-export function Progress({
+export function CustomProgress({
   value,
   className,
   indicatorClassName,
-}: ProgressProps) {
+}: CustomProgressProps) {
   return (
     <div
       className={cn(

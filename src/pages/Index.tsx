@@ -9,6 +9,7 @@ import { Newsletter } from '@/components/Newsletter';
 import { Footer } from '@/components/Footer';
 import { Toaster } from 'sonner';
 import { useEffect } from 'react';
+import { ScrollProgress } from '@/components/ui/progress-indicator';
 
 const Index = () => {
   useEffect(() => {
@@ -20,6 +21,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 to-purple-900 text-white">
       <Toaster position="top-right" />
       <Header />
+      <ScrollProgress />
       <main>
         <Hero />
         <CategorySection />
