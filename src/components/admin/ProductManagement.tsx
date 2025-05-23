@@ -1,7 +1,8 @@
 
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as productAPI from "@/api/products";
+import * as adminAPI from "@/api/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -18,14 +19,16 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Edit, Trash2, Image, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export const ProductManagement = () => {
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [isEditProductOpen, setIsEditProductOpen] = useState(false);
   const [isDeleteProductOpen, setIsDeleteProductOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const queryClient = useQueryClient();
 
   const [productForm, setProductForm] = useState({
     name: "",
@@ -34,7 +37,7 @@ export const ProductManagement = () => {
     discountPrice: 0,
     category: "",
     theme: "",
-    images: [""],
+    images: [] as string[],
     stock: 0,
     inStock: true,
     featured: false,
@@ -47,14 +50,59 @@ export const ProductManagement = () => {
     queryFn: () => productAPI.getProducts(),
   });
 
-  const { data: categories } = useQuery({
+  const { data: categories, isLoading: categoriesLoading } = useQuery({
     queryKey: ["product-categories"],
     queryFn: productAPI.getProductCategories,
   });
 
-  const { data: themes } = useQuery({
+  const { data: themes, isLoading: themesLoading } = useQuery({
     queryKey: ["product-themes"],
     queryFn: productAPI.getProductThemes,
+  });
+
+  // Create product mutation
+  const createProductMutation = useMutation({
+    mutationFn: (productData: FormData) => adminAPI.createProduct(productData),
+    onSuccess: () => {
+      toast.success("Product created successfully");
+      setIsAddProductOpen(false);
+      resetForm();
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+    },
+    onError: (error) => {
+      console.error("Error creating product:", error);
+      toast.error("Failed to create product");
+    }
+  });
+
+  // Update product mutation
+  const updateProductMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string, data: FormData }) => 
+      adminAPI.updateProduct(id, data),
+    onSuccess: () => {
+      toast.success("Product updated successfully");
+      setIsEditProductOpen(false);
+      resetForm();
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+    },
+    onError: (error) => {
+      console.error("Error updating product:", error);
+      toast.error("Failed to update product");
+    }
+  });
+
+  // Delete product mutation
+  const deleteProductMutation = useMutation({
+    mutationFn: (id: string) => adminAPI.deleteProduct(id),
+    onSuccess: () => {
+      toast.success("Product deleted successfully");
+      setIsDeleteProductOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+    },
+    onError: (error) => {
+      console.error("Error deleting product:", error);
+      toast.error("Failed to delete product");
+    }
   });
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,7 +134,7 @@ export const ProductManagement = () => {
       discountPrice: 0,
       category: "",
       theme: "",
-      images: [""],
+      images: [],
       stock: 0,
       inStock: true,
       featured: false,
@@ -107,7 +155,7 @@ export const ProductManagement = () => {
       images: product.images,
       stock: product.stock,
       inStock: product.inStock,
-      featured: product.featured,
+      featured: product.featured || false,
       sizes: product.sizes,
       colors: product.colors
     });
@@ -120,33 +168,81 @@ export const ProductManagement = () => {
   };
 
   const handleAddProduct = async () => {
-    toast({
-      title: "Product Added",
-      description: `${productForm.name} has been added successfully.`,
-    });
-    setIsAddProductOpen(false);
-    resetForm();
-    refetch();
+    try {
+      // Create FormData for the API call
+      const formData = new FormData();
+      formData.append('name', productForm.name);
+      formData.append('description', productForm.description);
+      formData.append('price', productForm.price.toString());
+      formData.append('discountPrice', productForm.discountPrice.toString());
+      formData.append('category', productForm.category);
+      formData.append('theme', productForm.theme);
+      formData.append('stock', productForm.stock.toString());
+      formData.append('featured', productForm.featured.toString());
+      
+      // Add sizes and colors
+      productForm.sizes.forEach(size => {
+        formData.append('sizes', size);
+      });
+      
+      productForm.colors.forEach(color => {
+        formData.append('colors', color);
+      });
+      
+      // Add images if any
+      productForm.images.forEach(image => {
+        formData.append('images', image);
+      });
+      
+      await createProductMutation.mutateAsync(formData);
+    } catch (error) {
+      console.error("Error creating product:", error);
+    }
   };
 
   const handleUpdateProduct = async () => {
-    toast({
-      title: "Product Updated",
-      description: `${productForm.name} has been updated successfully.`,
-    });
-    setIsEditProductOpen(false);
-    resetForm();
-    refetch();
+    if (!selectedProduct) return;
+    
+    try {
+      // Create FormData for the API call
+      const formData = new FormData();
+      formData.append('name', productForm.name);
+      formData.append('description', productForm.description);
+      formData.append('price', productForm.price.toString());
+      formData.append('discountPrice', productForm.discountPrice.toString());
+      formData.append('category', productForm.category);
+      formData.append('theme', productForm.theme);
+      formData.append('stock', productForm.stock.toString());
+      formData.append('featured', productForm.featured.toString());
+      
+      // Add sizes and colors
+      productForm.sizes.forEach(size => {
+        formData.append('sizes', size);
+      });
+      
+      productForm.colors.forEach(color => {
+        formData.append('colors', color);
+      });
+      
+      // Add images if any
+      productForm.images.forEach(image => {
+        formData.append('images', image);
+      });
+      
+      await updateProductMutation.mutateAsync({ id: selectedProduct.id, data: formData });
+    } catch (error) {
+      console.error("Error updating product:", error);
+    }
   };
 
   const handleDeleteProduct = async () => {
-    toast({
-      title: "Product Deleted",
-      description: `${selectedProduct?.name} has been deleted.`,
-    });
-    setIsDeleteProductOpen(false);
-    setSelectedProduct(null);
-    refetch();
+    if (!selectedProduct) return;
+    
+    try {
+      await deleteProductMutation.mutateAsync(selectedProduct.id);
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
   };
 
   const ProductFormContent = () => (
@@ -202,40 +298,48 @@ export const ProductManagement = () => {
           
           <div>
             <Label htmlFor="category">Category</Label>
-            <Select 
-              onValueChange={(value) => handleSelectChange("category", value)} 
-              value={productForm.category}
-            >
-              <SelectTrigger id="category">
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories?.map((category: string) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {categoriesLoading ? (
+              <div className="text-sm text-gray-500">Loading categories...</div>
+            ) : (
+              <Select 
+                onValueChange={(value) => handleSelectChange("category", value)} 
+                value={productForm.category}
+              >
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent className="bg-starry-darkPurple text-white border-starry-purple">
+                  {categories?.map((category: string) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
           
           <div>
             <Label htmlFor="theme">Theme</Label>
-            <Select 
-              onValueChange={(value) => handleSelectChange("theme", value)} 
-              value={productForm.theme}
-            >
-              <SelectTrigger id="theme">
-                <SelectValue placeholder="Select theme" />
-              </SelectTrigger>
-              <SelectContent>
-                {themes?.map((theme: string) => (
-                  <SelectItem key={theme} value={theme}>
-                    {theme}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {themesLoading ? (
+              <div className="text-sm text-gray-500">Loading themes...</div>
+            ) : (
+              <Select 
+                onValueChange={(value) => handleSelectChange("theme", value)} 
+                value={productForm.theme}
+              >
+                <SelectTrigger id="theme">
+                  <SelectValue placeholder="Select theme" />
+                </SelectTrigger>
+                <SelectContent className="bg-starry-darkPurple text-white border-starry-purple">
+                  {themes?.map((theme: string) => (
+                    <SelectItem key={theme} value={theme}>
+                      {theme}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
           
           <div className="flex items-center space-x-2">
@@ -358,6 +462,12 @@ export const ProductManagement = () => {
                         key={size} 
                         variant={productForm.sizes.includes(size) ? "default" : "outline"} 
                         className="cursor-pointer"
+                        onClick={() => {
+                          const updatedSizes = productForm.sizes.includes(size)
+                            ? productForm.sizes.filter(s => s !== size)
+                            : [...productForm.sizes, size];
+                          setProductForm({ ...productForm, sizes: updatedSizes });
+                        }}
                       >
                         {size}
                       </Badge>
@@ -372,6 +482,12 @@ export const ProductManagement = () => {
                         key={color} 
                         variant={productForm.colors.includes(color) ? "default" : "outline"} 
                         className="cursor-pointer"
+                        onClick={() => {
+                          const updatedColors = productForm.colors.includes(color)
+                            ? productForm.colors.filter(c => c !== color)
+                            : [...productForm.colors, color];
+                          setProductForm({ ...productForm, colors: updatedColors });
+                        }}
                       >
                         {color}
                       </Badge>
@@ -382,7 +498,13 @@ export const ProductManagement = () => {
             </Tabs>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsAddProductOpen(false)}>Cancel</Button>
-              <Button className="btn-hero-hover" onClick={handleAddProduct}>Add Product</Button>
+              <Button 
+                className="btn-hero-hover" 
+                onClick={handleAddProduct}
+                disabled={createProductMutation.isPending}
+              >
+                {createProductMutation.isPending ? 'Adding...' : 'Add Product'}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -422,7 +544,7 @@ export const ProductManagement = () => {
                 </TableRow>
               ) : (
                 filteredProducts?.map((product: Product) => (
-                  <TableRow key={product.id} className="hover:bg-starry-darkPurple/60">
+                  <TableRow key={product._id || product.id} className="hover:bg-starry-darkPurple/60">
                     <TableCell>
                       <div className="h-12 w-12 rounded-md overflow-hidden bg-gray-200">
                         {product.images && product.images.length > 0 ? (
@@ -500,7 +622,13 @@ export const ProductManagement = () => {
           <ProductFormContent />
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditProductOpen(false)}>Cancel</Button>
-            <Button className="btn-hero-hover" onClick={handleUpdateProduct}>Update Product</Button>
+            <Button 
+              className="btn-hero-hover" 
+              onClick={handleUpdateProduct}
+              disabled={updateProductMutation.isPending}
+            >
+              {updateProductMutation.isPending ? 'Updating...' : 'Update Product'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -515,7 +643,13 @@ export const ProductManagement = () => {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleteProductOpen(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleDeleteProduct}>Delete</Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleDeleteProduct}
+              disabled={deleteProductMutation.isPending}
+            >
+              {deleteProductMutation.isPending ? 'Deleting...' : 'Delete'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

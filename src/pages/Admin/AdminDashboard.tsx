@@ -10,6 +10,7 @@ import { DiscountManagement } from "@/components/admin/DiscountManagement";
 import AdminProductAnalytics from "@/components/admin/AdminProductAnalytics";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { AdminTabsNavigation } from "@/components/admin/AdminTabsNavigation";
+import { Toaster } from "sonner";
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -34,6 +35,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-admin-black text-admin-white">
+      <Toaster position="top-right" />
       <AdminHeader handleLogout={handleLogout} />
       
       {/* Main Content */}
@@ -46,6 +48,10 @@ const AdminDashboard = () => {
             />
 
             <TabsContent value="products" className="pt-2">
+              <ProductManagement />
+            </TabsContent>
+
+            <TabsContent value="analytics" className="pt-2">
               <AdminProductAnalytics />
             </TabsContent>
 
