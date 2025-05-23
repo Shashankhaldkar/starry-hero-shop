@@ -1,6 +1,4 @@
-
 import React, { useEffect, useState } from "react";
-import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
 interface ScrollProgressProps {
@@ -12,7 +10,6 @@ export const ScrollProgress = ({ className }: ScrollProgressProps) => {
 
   useEffect(() => {
     const updateScroll = () => {
-      // Calculate how far down the page the user has scrolled
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
       const calculatedProgress = (scrollTop / scrollHeight) * 100;
@@ -24,13 +21,13 @@ export const ScrollProgress = ({ className }: ScrollProgressProps) => {
   }, []);
 
   return (
-    <Progress 
-      value={progress} 
+    <CustomProgress
+      value={progress}
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 h-1 bg-transparent rounded-none", 
+        "fixed top-0 left-0 right-0 z-50 h-1 bg-transparent rounded-none",
         className
-      )} 
-      indicatorClassName="bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-400" 
+      )}
+      indicatorClassName="bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-400"
     />
   );
 };
@@ -54,7 +51,7 @@ export function CustomProgress({
       )}
     >
       <div
-        className={cn("h-full w-full flex-1 bg-primary transition-all", indicatorClassName)}
+        className={cn("h-full flex-1 transition-all", indicatorClassName)}
         style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
       />
     </div>
