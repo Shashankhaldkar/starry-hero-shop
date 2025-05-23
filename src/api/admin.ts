@@ -1,5 +1,6 @@
+
 import API from './index';
-import { Product } from '@/types';
+import { Product, Coupon } from '@/types';
 
 // Get all admin products
 export const getAdminProducts = async () => {
@@ -124,5 +125,47 @@ export const getProductAnalytics = async (productId: string, timeRange: string) 
       averageRating: 4.5,
       conversionRate: 7.8
     };
+  }
+};
+
+// Add missing coupon management functions
+export const getCoupons = async (): Promise<Coupon[]> => {
+  try {
+    const { data } = await API.get('/coupons');
+    return data;
+  } catch (error) {
+    console.error('Error fetching coupons:', error);
+    // Return empty array or sample data for fallback
+    return [];
+  }
+};
+
+export const createCoupon = async (couponData: any) => {
+  try {
+    const { data } = await API.post('/coupons', couponData);
+    return data;
+  } catch (error) {
+    console.error('Error creating coupon:', error);
+    throw error;
+  }
+};
+
+export const updateCoupon = async (id: string, couponData: any) => {
+  try {
+    const { data } = await API.put(`/coupons/${id}`, couponData);
+    return data;
+  } catch (error) {
+    console.error('Error updating coupon:', error);
+    throw error;
+  }
+};
+
+export const deleteCoupon = async (id: string) => {
+  try {
+    const { data } = await API.delete(`/coupons/${id}`);
+    return data;
+  } catch (error) {
+    console.error('Error deleting coupon:', error);
+    throw error;
   }
 };

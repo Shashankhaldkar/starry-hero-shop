@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { 
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
@@ -22,18 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as adminAPI from "@/api/admin";
 import { toast } from "sonner";
-
-interface Coupon {
-  id: string;
-  code: string;
-  type: string;
-  amount: number;
-  minimumPurchase: number;
-  usageCount: number;
-  startDate: string;
-  endDate: string;
-  isActive: boolean;
-}
+import { Coupon } from "@/types";
 
 export const DiscountManagement = () => {
   const { toast: uiToast } = useToast();
@@ -58,16 +46,18 @@ export const DiscountManagement = () => {
     isActive: true
   });
 
-  // Fetch coupons data
+  // Fetch coupons data - fixed the useQuery syntax
   const { data: couponsData, isLoading: couponsLoading } = useQuery({
     queryKey: ['coupons'],
     queryFn: adminAPI.getCoupons,
-    onError: (error) => {
-      console.error("Error fetching coupons:", error);
-      uiToast({
-        title: "Error",
-        description: "Failed to load coupons. Using sample data.",
-      });
+    meta: { // Using meta for error handling instead of onError
+      error: (error: any) => {
+        console.error("Error fetching coupons:", error);
+        uiToast({
+          title: "Error",
+          description: "Failed to load coupons. Using sample data.",
+        });
+      }
     }
   });
 
@@ -185,8 +175,8 @@ export const DiscountManagement = () => {
     setCouponForm({
       code: coupon.code,
       description: coupon.description || "",
-      discountType: coupon.type,
-      discountAmount: coupon.amount,
+      discountType: coupon.discountType,
+      discountAmount: coupon.discountAmount,
       minimumPurchase: coupon.minimumPurchase,
       startDate: new Date(coupon.startDate),
       endDate: new Date(coupon.endDate),
@@ -480,14 +470,14 @@ export const DiscountManagement = () => {
                     <TableCell className="font-medium">{coupon.code}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className="capitalize">
-                        {coupon.type === "percentage" ? 
+                        {coupon.discountType === "percentage" ? 
                           <span className="flex items-center"><Percent className="h-3 w-3 mr-1" /> Percentage</span> : 
                           <span className="flex items-center"><Tag className="h-3 w-3 mr-1" /> Fixed</span>
                         }
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {coupon.type === "percentage" ? `${coupon.amount}%` : `$${coupon.amount.toFixed(2)}`}
+                      {coupon.discountType === "percentage" ? `${coupon.discountAmount}%` : `$${coupon.discountAmount.toFixed(2)}`}
                     </TableCell>
                     <TableCell>
                       {coupon.minimumPurchase > 0 ? `$${coupon.minimumPurchase.toFixed(2)}` : "None"}
@@ -588,12 +578,12 @@ export const DiscountManagement = () => {
 };
 
 // Sample data as fallback if API fails
-const sampleCoupons = [
+const sampleCoupons: Coupon[] = [
   {
     id: "COUPON-001",
     code: "SUMMER25",
-    type: "percentage",
-    amount: 25,
+    discountType: "percentage",
+    discountAmount: 25,
     minimumPurchase: 50,
     usageCount: 145,
     startDate: "2023-06-01",
@@ -603,8 +593,8 @@ const sampleCoupons = [
   {
     id: "COUPON-002",
     code: "FREESHIP",
-    type: "fixed",
-    amount: 10,
+    discountType: "fixed",
+    discountAmount: 10,
     minimumPurchase: 75,
     usageCount: 89,
     startDate: "2023-04-15",
@@ -614,8 +604,8 @@ const sampleCoupons = [
   {
     id: "COUPON-003",
     code: "WELCOME10",
-    type: "percentage",
-    amount: 10,
+    discountType: "percentage",
+    discountAmount: 10,
     minimumPurchase: 0,
     usageCount: 210,
     startDate: "2023-01-01",
@@ -625,8 +615,8 @@ const sampleCoupons = [
   {
     id: "COUPON-004",
     code: "FLASH50",
-    type: "percentage",
-    amount: 50,
+    discountType: "percentage",
+    discountAmount: 50,
     minimumPurchase: 150,
     usageCount: 32,
     startDate: "2023-04-10",

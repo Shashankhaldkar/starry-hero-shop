@@ -23,6 +23,7 @@ export interface Product {
 
 export interface Review {
   id?: string;
+  _id?: string; // Adding this to fix the ProductDetail.tsx error
   name: string;
   rating: number;
   comment: string;
@@ -94,4 +95,24 @@ export interface Coupon {
   usageLimit?: number;
   usageCount: number;
   isActive: boolean;
+}
+
+// Adding missing type definitions
+export interface CartItem {
+  product: Product;
+  quantity: number;
+  size: string;
+  color: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  image: string;
+}
+
+export interface Theme {
+  id: string;
+  name: string;
+  image: string;
 }
