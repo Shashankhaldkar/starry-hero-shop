@@ -24,7 +24,14 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     setIsLoading(true);
     
     try {
-      addToCart(product);
+      addToCart(
+        product,
+        1,
+        product.price.toString(),
+        product.discountPrice !== undefined && product.discountPrice !== null
+          ? product.discountPrice.toString()
+          : null
+      );
       
       toast({
         title: "Added to cart",
