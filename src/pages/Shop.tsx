@@ -99,7 +99,7 @@ const Shop = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-            StaartHero Shop
+            StarryHero Shop
           </h1>
           <p className="text-purple-300 text-lg">
             Discover our complete collection of superhero apparel

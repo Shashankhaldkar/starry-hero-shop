@@ -12,19 +12,19 @@ export function Footer() {
         <div className="absolute top-40 left-20 w-40 h-40 border-8 border-white rounded-full"></div>
         <div className="absolute bottom-60 right-40 w-60 h-60 border-8 border-white rounded-full"></div>
       </div>
-      
+
       <div className="container mx-auto px-4 relative z-10">
         {/* Main footer content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand section */}
           <div>
             <Link to="/" className="inline-block mb-6">
-              <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-                Heroic<span className="text-yellow-400">Threads</span>
+              <span className="text-2xl font-bold bg-gradient-to-r text-white text-transparent bg-clip-text">
+                Starry<span className="text-[#f97316]">Hero</span>
               </span>
             </Link>
             <p className="text-purple-300 mb-6 leading-relaxed">
-              Embrace your inner hero with our comic-inspired apparel. 
+              Embrace your inner hero with our comic-inspired apparel.
               Each design tells a story, just like you.
             </p>
             <div className="flex space-x-4">
@@ -168,7 +168,7 @@ export function Footer() {
             </Link>
           </div>
         </div>
-        
+
         {/* Comic-style signature */}
         <div className="text-center mt-8">
           <div className="inline-block px-4 py-1 bg-purple-900/30 border border-purple-700/30 rounded-md">

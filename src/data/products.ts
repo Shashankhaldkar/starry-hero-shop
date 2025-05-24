@@ -30,7 +30,7 @@ export const themes: Theme[] = [
   {
     id: "marvel-universe",
     name: "Marvel Universe",
-    image: "https://images.unsplash.com/photo-1635805737707-575885c16d07?q=80&w=3087&auto=format&fit=crop"
+    image: "https://i.pinimg.com/736x/fd/9a/ad/fd9aad0320727b5f241b06211da8d01d.jpg"
   },
   {
     id: "dc-comics",

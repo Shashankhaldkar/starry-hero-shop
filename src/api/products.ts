@@ -14,7 +14,7 @@ const getMockProducts = (): Product[] => {
       price: 34.99,
       discountPrice: 29.99,
       images: [
-        "https://images.unsplash.com/photo-1583744946564-b52d01a7b321?auto=format&fit=crop&q=80&w=500",
+        "https://www.theshirtlist.com/wp-content/uploads/2021/03/Wanda-Kiss-T-Shirt.jpg",
         "https://images.unsplash.com/photo-1554568218-0f1715e72254?auto=format&fit=crop&q=80&w=500"
       ],
       category: "Oversized",
@@ -237,50 +237,66 @@ export const getProducts = async (params: {
   minPrice?: number;
   maxPrice?: number;
 } = {}): Promise<{ products: Product[]; page: number; pages: number; total: number }> => {
+  console.log('Attempting to fetch products from API...');
+
   try {
-    console.log('Attempting to fetch products from API...');
     const response = await axios.get(`${API_BASE_URL}/products`, { params });
+
+    // Axios doesn't throw for HTTP errors, so check status manually
+    if (response.status !== 200 || !response.data.products) {
+      throw new Error(`Unexpected response: ${response.status}`);
+    }
+
     return response.data;
-  } catch (error) {
-    console.log('API unavailable, using mock data');
+  } catch (error: any) {
+    console.warn('API unavailable or returned invalid response. Falling back to mock data.');
+
     const mockProducts = getMockProducts();
-    
+
     // Apply filters to mock data
     let filteredProducts = mockProducts;
-    
+
     if (params.keyword) {
       filteredProducts = filteredProducts.filter(product =>
         product.name.toLowerCase().includes(params.keyword!.toLowerCase()) ||
         product.description.toLowerCase().includes(params.keyword!.toLowerCase())
       );
     }
-    
-    if (params.category && params.category !== 'all') {
+
+    if (params.category && params.category.toLowerCase() !== 'all') {
       filteredProducts = filteredProducts.filter(product =>
         product.category.toLowerCase() === params.category!.toLowerCase()
       );
     }
-    
-    if (params.theme && params.theme !== 'all') {
+
+    if (params.theme && params.theme.toLowerCase() !== 'all') {
       filteredProducts = filteredProducts.filter(product =>
         product.theme.toLowerCase() === params.theme!.toLowerCase()
       );
     }
-    
+
     if (params.minPrice !== undefined && params.maxPrice !== undefined) {
       filteredProducts = filteredProducts.filter(product =>
         product.price >= params.minPrice! && product.price <= params.maxPrice!
       );
     }
-    
+
+    const currentPage = params.page || 1;
+    const perPage = 10;
+    const total = filteredProducts.length;
+    const pages = Math.ceil(total / perPage);
+
+    const paginatedProducts = filteredProducts.slice((currentPage - 1) * perPage, currentPage * perPage);
+
     return {
-      products: filteredProducts,
-      page: params.page || 1,
-      pages: Math.ceil(filteredProducts.length / 10),
-      total: filteredProducts.length
+      products: paginatedProducts,
+      page: currentPage,
+      pages,
+      total
     };
   }
 };
+
 
 export const getProductById = async (id: string): Promise<Product | null> => {
   try {

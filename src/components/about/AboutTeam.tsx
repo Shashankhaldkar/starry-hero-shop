@@ -3,18 +3,15 @@ export const AboutTeam = () => {
   const teamMembers = [
     {
       name: "Shashank Haldkar",
-      role: "Founder & CEO",
-      image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=300",
+      image: 'https://placehold.co/350x250?text=Shashank+Haldkar&font=Playfair%20Display',
     },
     {
       name: "Ethepu Deepika",
-      role: "Creative Director",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=300",
+      image: 'https://placehold.co/350x250?text=Ethepu+Deepika&font=Playfair%20Display',
     },
     {
       name: "Gokilavani S",
-      role: "Operations Manager",
-      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=300",
+      image: 'https://placehold.co/350x250?text=Gokilavani+S&font=Playfair%20Display',
     },
   ];
 
@@ -37,7 +34,6 @@ export const AboutTeam = () => {
               </div>
               <div className="p-6 text-center">
                 <h3 className="font-bold text-xl mb-2">{member.name}</h3>
-                <p className="text-starry-purple">{member.role}</p>
               </div>
             </div>
           ))}

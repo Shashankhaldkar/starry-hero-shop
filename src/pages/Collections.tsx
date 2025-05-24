@@ -27,7 +27,7 @@ const Collections = () => {
 
   // Sample images for categories and themes
   const categoryImages = {
-    "Oversized": "https://images.unsplash.com/photo-1583744946564-b52d01a7b321?q=80&w=500",
+    "Oversized": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThqgsPLtI5zerhVPkaVfiFQ3YaCtrTBN2Qrg&s",
     "Acid Wash": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=500",
     "Graphic Printed": "https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?q=80&w=500",
     "Solid Color": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=500",
@@ -56,7 +56,7 @@ const Collections = () => {
         {/* Hero Section */}
         <div className="text-center py-12 mb-8">
           <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">
-            StaartHero Collections
+            StarryHero Collection
           </h1>
           <p className="text-purple-300 text-lg max-w-2xl mx-auto">
             Explore our curated collections of superhero and pop culture t-shirts designed for style and comfort

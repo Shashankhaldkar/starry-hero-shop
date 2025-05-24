@@ -165,7 +165,7 @@ export const getMockProducts = (): Product[] => {
       price: 34.99,
       discountPrice: 29.99,
       images: [
-        "https://images.unsplash.com/photo-1583744946564-b52d01a7b321?auto=format&fit=crop&q=80&w=500",
+        "https://www.theshirtlist.com/wp-content/uploads/2021/03/Wanda-Kiss-T-Shirt.jpg",
         "https://images.unsplash.com/photo-1554568218-0f1715e72254?auto=format&fit=crop&q=80&w=500"
       ],
       category: "Oversized",
@@ -417,7 +417,7 @@ export const getMockProducts = (): Product[] => {
       price: 32.99,
       discountPrice: 29.99,
       images: [
-        "https://images.unsplash.com/photo-1635805737707-575885c16d07?auto=format&fit=crop&q=80&w=500",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEi6AA0fhFdBQ4GywQkUedVDK2mcdsmARWFg&s",
         "https://images.unsplash.com/photo-1612033448550-9d6f55312cb4?auto=format&fit=crop&q=80&w=500"
       ],
       category: "Graphic Printed",
