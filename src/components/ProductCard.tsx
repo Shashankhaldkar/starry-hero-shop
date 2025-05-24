@@ -42,7 +42,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         title: "Error",
         description: "Failed to add item to cart",
         variant: "destructive",
-      });
+      }); 
     } finally {
       setIsLoading(false);
     }

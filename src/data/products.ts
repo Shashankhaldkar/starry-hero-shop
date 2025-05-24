@@ -6,7 +6,7 @@ export const categories: Category[] = [
   {
     id: "oversized",
     name: "Oversized",
-    image: "https://images.unsplash.com/photo-1583744946564-b52d01a7b321?q=80&w=3087&auto=format&fit=crop"
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTW-1eXTZA5CRrcSVyHdksL4WcYMkceUTZovg&s"
   },
   {
     id: "acid-wash",
