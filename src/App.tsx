@@ -19,6 +19,21 @@ import Collections from "./pages/Collections";
 import Account from "./pages/Account";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 
+// New pages
+import NewArrivals from "./pages/NewArrivals";
+import BestSellers from "./pages/BestSellers";
+import Sale from "./pages/Sale";
+import GiftCards from "./pages/GiftCards";
+import Blog from "./pages/Blog";
+import Careers from "./pages/Careers";
+import Sustainability from "./pages/Sustainability";
+import Press from "./pages/Press";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Shipping from "./pages/Shipping";
+import FAQ from "./pages/FAQ";
+import Category from "./pages/Category";
+
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { LoginRegisterModal } from "@/components/LoginRegisterModal";
 
@@ -89,6 +104,22 @@ const ProtectedRoutes = () => {
             <Route path="/cart" element={<Cart />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/about" element={<About />} />
+            
+            {/* New pages */}
+            <Route path="/new-arrivals" element={<NewArrivals />} />
+            <Route path="/best-sellers" element={<BestSellers />} />
+            <Route path="/sale" element={<Sale />} />
+            <Route path="/gift-cards" element={<GiftCards />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/careers" element={<Careers />} />
+            <Route path="/sustainability" element={<Sustainability />} />
+            <Route path="/press" element={<Press />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/shipping" element={<Shipping />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/category/:categoryId" element={<Category />} />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
