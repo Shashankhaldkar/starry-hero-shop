@@ -24,12 +24,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     setIsLoading(true);
     
     try {
-      addToCart({
-        product,
-        quantity: 1,
-        size: product.sizes[0] || 'M',
-        color: product.colors[0] || 'Black'
-      });
+      addToCart(product);
       
       toast({
         title: "Added to cart",

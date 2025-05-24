@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 import { Product } from '@/types';
 
@@ -291,6 +290,43 @@ export const getProductById = async (id: string): Promise<Product | null> => {
     console.log('API unavailable, using mock data');
     const mockProducts = getMockProducts();
     return mockProducts.find(product => product.id === id) || null;
+  }
+};
+
+export const getRelatedProducts = async (productId: string): Promise<Product[]> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/products/${productId}/related`);
+    return response.data;
+  } catch (error) {
+    console.log('API unavailable, using mock related products');
+    const mockProducts = getMockProducts();
+    // Return random 3 products as related products
+    return mockProducts.slice(0, 3);
+  }
+};
+
+export const getProductReviews = async (productId: string) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/products/${productId}/reviews`);
+    return response.data;
+  } catch (error) {
+    console.log('API unavailable, using mock reviews');
+    return [];
+  }
+};
+
+export const addProductReview = async (productId: string, reviewData: { rating: number; comment: string }) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.post(
+      `${API_BASE_URL}/products/${productId}/reviews`,
+      reviewData,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response.data;
+  } catch (error) {
+    console.log('API unavailable, simulating review submission');
+    return { message: 'Review submitted successfully' };
   }
 };
 
